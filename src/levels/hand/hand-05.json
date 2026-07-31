@@ -1,0 +1,18 @@
+{
+  "id": "hand-05",
+  "gridSize": { "rows": 8, "cols": 8 },
+  "colors": [
+    { "colorId": "sky", "endpoints": [{ "row": 0, "col": 0 }, { "row": 0, "col": 7 }] },
+    { "colorId": "green", "endpoints": [{ "row": 7, "col": 0 }, { "row": 7, "col": 7 }] },
+    { "colorId": "blue", "endpoints": [{ "row": 1, "col": 0 }, { "row": 1, "col": 7 }] },
+    { "colorId": "yellow", "endpoints": [{ "row": 2, "col": 0 }, { "row": 6, "col": 3 }] },
+    { "colorId": "orange", "endpoints": [{ "row": 2, "col": 1 }, { "row": 5, "col": 3 }] },
+    { "colorId": "vermillion", "endpoints": [{ "row": 2, "col": 5 }, { "row": 6, "col": 4 }] }
+  ],
+  "origin": "hand",
+  "difficultyTag": "easy",
+  "difficultyScore": 0,
+  "handDraftOrder": 5,
+  "solution": [],
+  "minTotalEdgeLength": 0
+}
