@@ -78,7 +78,7 @@ describe('attachInputHandler', () => {
     const state: GameState = { levelId: level.id, paths: new Map(), activeColorId: null };
     const onClick = vi.fn();
 
-    attachInputHandler(canvas, level, () => state, onClick);
+    attachInputHandler(canvas, () => level, () => state, onClick);
     dispatchPointerDown(canvas, 30, 30); // center of cell (row 0, col 0)
 
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -96,7 +96,7 @@ describe('attachInputHandler', () => {
       state = newState;
     });
 
-    attachInputHandler(canvas, level, () => state, onClick);
+    attachInputHandler(canvas, () => level, () => state, onClick);
     dispatchPointerDown(canvas, 30, 30); // start path at (row 0, col 0)
     dispatchPointerDown(canvas, 3 * cellSize + 30, 2 * cellSize + 30); // diagonal click at (row 2, col 3)
 
@@ -115,7 +115,7 @@ describe('attachInputHandler', () => {
     const state: GameState = { levelId: level.id, paths: new Map(), activeColorId: null };
     const onClick = vi.fn();
 
-    attachInputHandler(canvas, level, () => state, onClick);
+    attachInputHandler(canvas, () => level, () => state, onClick);
     dispatchPointerDown(canvas, canvas.width + 10, 30);
 
     expect(onClick).not.toHaveBeenCalled();

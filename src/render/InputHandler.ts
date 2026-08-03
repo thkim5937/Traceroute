@@ -30,11 +30,12 @@ export function pixelToCell(
 
 export function attachInputHandler(
   canvas: HTMLCanvasElement,
-  level: LevelData,
+  getLevel: () => LevelData,
   getState: () => GameState,
   onClick: (clickCell: Coord, prevState: GameState, newState: GameState) => void,
 ): void {
   canvas.addEventListener('pointerdown', (event) => {
+    const level = getLevel();
     const cell = pixelToCell(canvas, level, event.clientX, event.clientY);
     if (cell === null) {
       return;

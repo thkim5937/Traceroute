@@ -246,6 +246,42 @@ code {
   }
 }
 
+#board {
+  position: relative;
+  display: inline-block;
+}
+
+.clear-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(8, 6, 13, 0.6);
+  color: #fff;
+}
+
+.clear-overlay--visible {
+  display: flex;
+}
+
+.clear-overlay__message {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.clear-overlay__button {
+  padding: 8px 20px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+}
+
 .ticks {
   position: relative;
   width: 100%;
