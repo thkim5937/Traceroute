@@ -11,6 +11,11 @@ export interface GameController {
   isClear: () => boolean;
   handleClickResult: (prevState: GameState, newState: GameState, onNoOpClick?: () => void) => void;
   resetLevel: () => void;
+  undo: () => void;
+  redo: () => void;
+  clearBoard: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 export function createGameController(
@@ -21,6 +26,17 @@ export function createGameController(
 ): GameController {
   let state = createFreshState(level);
   let clear = false;
+  let past: GameState[] = [];
+  let future: GameState[] = [];
+
+  function syncClearStatus(): void {
+    clear = isBoardClear(state, level);
+    if (clear) {
+      showOverlay();
+    } else {
+      hideOverlay();
+    }
+  }
 
   function handleClickResult(
     prevState: GameState,
@@ -34,6 +50,8 @@ export function createGameController(
       onNoOpClick?.();
       return;
     }
+    past.push(state);
+    future = [];
     state = updateCompletionStatus(newState, level);
     render();
     if (isBoardClear(state, level)) {
@@ -45,6 +63,39 @@ export function createGameController(
   function resetLevel(): void {
     state = createFreshState(level);
     clear = false;
+    past = [];
+    future = [];
+    hideOverlay();
+    render();
+  }
+
+  function undo(): void {
+    const prevState = past.pop();
+    if (prevState === undefined) {
+      return;
+    }
+    future.push(state);
+    state = prevState;
+    syncClearStatus();
+    render();
+  }
+
+  function redo(): void {
+    const nextState = future.pop();
+    if (nextState === undefined) {
+      return;
+    }
+    past.push(state);
+    state = nextState;
+    syncClearStatus();
+    render();
+  }
+
+  function clearBoard(): void {
+    past.push(state);
+    future = [];
+    state = createFreshState(level);
+    clear = false;
     hideOverlay();
     render();
   }
@@ -54,5 +105,10 @@ export function createGameController(
     isClear: () => clear,
     handleClickResult,
     resetLevel,
+    undo,
+    redo,
+    clearBoard,
+    canUndo: () => past.length > 0,
+    canRedo: () => future.length > 0,
   };
 }

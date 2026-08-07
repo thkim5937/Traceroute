@@ -282,6 +282,27 @@ code {
   color: #fff;
 }
 
+.control-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.control-bar__button {
+  padding: 8px 16px;
+  font-size: 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+}
+
+.control-bar__button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .ticks {
   position: relative;
   width: 100%;

@@ -1,5 +1,5 @@
 import { resolveColorIdForClick } from '../engine/PathEngine.ts';
-import { renderGrid, renderDots, renderPaths } from './CanvasRenderer.ts';
+import { renderGrid, renderDots, renderPaths, renderBlockedCells } from './CanvasRenderer.ts';
 import type { GameState } from '../engine/GameState.ts';
 import type { Coord, LevelData } from '../data/LevelSchema.ts';
 
@@ -13,8 +13,14 @@ export function detectBounceBackTarget(
     return null;
   }
 
-  const path = prevState.paths.get(colorId)?.path;
+  const colorState = prevState.paths.get(colorId);
+  if (colorState?.completed === true) {
+    return null;
+  }
+
+  const path = colorState?.path;
   const tail = path?.[path.length - 1];
+
   if (tail === undefined) {
     return null;
   }
@@ -55,6 +61,7 @@ export function playBounceBackAnimation(
 
   function drawStaticScene(): void {
     renderGrid(ctx, level.gridSize, cellSize);
+    renderBlockedCells(ctx, level.obstacles?.blockedCells, cellSize);
     renderDots(ctx, level.colors, cellSize, palette);
     renderPaths(ctx, gameState, level, cellSize, palette);
   }

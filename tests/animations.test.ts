@@ -68,6 +68,63 @@ describe('detectBounceBackTarget', () => {
     expect(result).toBeNull();
   });
 
+  it('returns null for a click on a completed color, even when not aligned with the tail (silent no-op, not a bounce)', () => {
+    const state: GameState = {
+      levelId: level.id,
+      paths: new Map([
+        [
+          'a',
+          {
+            colorId: 'a',
+            path: [
+              { row: 1, col: 1 },
+              { row: 1, col: 3 },
+              { row: 3, col: 3 },
+              { row: 3, col: 1 },
+            ],
+            completed: true,
+          },
+        ],
+      ]),
+      activeColorId: 'a',
+    };
+
+    // (1,2) is a mid-path cell on the completed color, and shares neither
+    // row nor col with the tail (3,1) — a completed color's click is always
+    // a silent no-op, never a bounce-back target.
+    const result = detectBounceBackTarget(state, level, { row: 1, col: 2 });
+
+    expect(result).toBeNull();
+  });
+
+  it('returns null for a click on a completed color that IS aligned with the tail (still a silent no-op, not a bounce)', () => {
+    const state: GameState = {
+      levelId: level.id,
+      paths: new Map([
+        [
+          'a',
+          {
+            colorId: 'a',
+            path: [
+              { row: 1, col: 1 },
+              { row: 1, col: 3 },
+              { row: 3, col: 3 },
+              { row: 3, col: 1 },
+            ],
+            completed: true,
+          },
+        ],
+      ]),
+      activeColorId: 'a',
+    };
+
+    // (0,1) shares column 1 with the tail (3,1) — the same click that would
+    // trigger a bounce-back for an incomplete color must stay silent here.
+    const result = detectBounceBackTarget(state, level, { row: 0, col: 1 });
+
+    expect(result).toBeNull();
+  });
+
   it('returns null when the targeted color has not been started yet', () => {
     const state: GameState = {
       levelId: level.id,

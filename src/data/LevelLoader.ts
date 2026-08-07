@@ -6,17 +6,16 @@ const levelModules = import.meta.glob<LevelData>(
   { eager: true, import: 'default' },
 );
 
-const levelsById = new Map<string, LevelData>();
-for (const level of Object.values(levelModules)) {
-  levelsById.set(level.id, level);
-}
-
 export function loadLevelIndex(): LevelIndex {
   return indexData as LevelIndex;
 }
 
 export function loadLevelById(id: string): LevelData {
-  const level = levelsById.get(id);
+  const entry = loadLevelIndex().find((e) => e.id === id);
+  if (entry === undefined) {
+    throw new Error(`Level not found: ${id}`);
+  }
+  const level = levelModules[`../levels/${entry.origin}/${id}.json`];
   if (level === undefined) {
     throw new Error(`Level not found: ${id}`);
   }

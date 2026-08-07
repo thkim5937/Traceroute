@@ -213,4 +213,114 @@ describe('createGameController', () => {
     expect(controller.getState().paths.size).toBe(0);
     expect(hideOverlay).toHaveBeenCalledTimes(1);
   });
+
+  const afterStart: GameState = {
+    levelId: level.id,
+    paths: new Map([['a', { colorId: 'a', path: [{ row: 0, col: 0 }], completed: false }]]),
+    activeColorId: 'a',
+  };
+  const afterComplete: GameState = {
+    levelId: level.id,
+    paths: new Map([
+      [
+        'a',
+        {
+          colorId: 'a',
+          path: [
+            { row: 0, col: 0 },
+            { row: 0, col: 1 },
+          ],
+          completed: false,
+        },
+      ],
+    ]),
+    activeColorId: 'a',
+  };
+
+  it('undo reverts the last committed click and redo re-applies it', () => {
+    const render = vi.fn();
+    const showOverlay = vi.fn();
+    const hideOverlay = vi.fn();
+    const controller = createGameController(level, render, showOverlay, hideOverlay);
+    controller.handleClickResult(emptyState, afterStart);
+
+    expect(controller.canUndo()).toBe(true);
+    controller.undo();
+    expect(controller.getState().paths.size).toBe(0);
+    expect(controller.canUndo()).toBe(false);
+    expect(controller.canRedo()).toBe(true);
+
+    controller.redo();
+    expect(controller.getState().paths.get('a')?.path).toEqual([{ row: 0, col: 0 }]);
+    expect(controller.canRedo()).toBe(false);
+  });
+
+  it('a new committed click after undo clears the redo future', () => {
+    const render = vi.fn();
+    const showOverlay = vi.fn();
+    const hideOverlay = vi.fn();
+    const controller = createGameController(level, render, showOverlay, hideOverlay);
+    controller.handleClickResult(emptyState, afterStart);
+    controller.handleClickResult(afterStart, afterComplete);
+    controller.undo();
+    expect(controller.canRedo()).toBe(true);
+
+    const differentClick: GameState = {
+      levelId: level.id,
+      paths: new Map([['a', { colorId: 'a', path: [], completed: false }]]),
+      activeColorId: null,
+    };
+    controller.handleClickResult(controller.getState(), differentClick);
+
+    expect(controller.canRedo()).toBe(false);
+  });
+
+  it('clearBoard resets to the initial empty state and is itself undoable', () => {
+    const render = vi.fn();
+    const showOverlay = vi.fn();
+    const hideOverlay = vi.fn();
+    const controller = createGameController(level, render, showOverlay, hideOverlay);
+    controller.handleClickResult(emptyState, afterStart);
+
+    controller.clearBoard();
+    expect(controller.getState().paths.size).toBe(0);
+    expect(controller.isClear()).toBe(false);
+    expect(hideOverlay).toHaveBeenCalled();
+
+    expect(controller.canUndo()).toBe(true);
+    controller.undo();
+    expect(controller.getState().paths.get('a')?.path).toEqual([{ row: 0, col: 0 }]);
+  });
+
+  it('undo un-freezes a color that was completed before the reverted click (§5.1 rule 0)', () => {
+    const render = vi.fn();
+    const showOverlay = vi.fn();
+    const hideOverlay = vi.fn();
+    const controller = createGameController(level, render, showOverlay, hideOverlay);
+    controller.handleClickResult(emptyState, afterStart);
+    controller.handleClickResult(afterStart, afterComplete);
+    expect(controller.isClear()).toBe(true);
+
+    controller.undo();
+
+    expect(controller.isClear()).toBe(false);
+    expect(controller.getState().paths.get('a')?.completed).toBe(false);
+
+    // Freeze check in PathEngine reads state.paths.get(colorId).completed; confirm
+    // a click against the now-reverted state is no longer treated as frozen.
+    const clickAgain: GameState = {
+      levelId: level.id,
+      paths: new Map([['a', { colorId: 'a', path: [{ row: 0, col: 0 }], completed: false }]]),
+      activeColorId: 'a',
+    };
+    controller.handleClickResult(controller.getState(), clickAgain);
+    expect(controller.getState().paths.get('a')?.path).toEqual([{ row: 0, col: 0 }]);
+  });
+
+  it('canUndo/canRedo report false with empty history', () => {
+    const render = vi.fn();
+    const controller = createGameController(level, render, vi.fn(), vi.fn());
+    expect(controller.canUndo()).toBe(false);
+    expect(controller.canRedo()).toBe(false);
+  });
 });

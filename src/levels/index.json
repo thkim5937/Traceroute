@@ -1,8 +1,227 @@
 [
-  { "id": "hand-01", "difficultyScore": 0, "origin": "hand" },
-  { "id": "hand-02", "difficultyScore": 0, "origin": "hand" },
-  { "id": "hand-03", "difficultyScore": 0, "origin": "hand" },
-  { "id": "hand-04", "difficultyScore": 0, "origin": "hand" },
-  { "id": "hand-05", "difficultyScore": 0, "origin": "hand" },
-  { "id": "hand-06", "difficultyScore": 0, "origin": "hand" }
+  {
+    "id": "gen-0001",
+    "difficultyScore": 32,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0002",
+    "difficultyScore": 34,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0003",
+    "difficultyScore": 32,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0004",
+    "difficultyScore": 44,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0005",
+    "difficultyScore": 29,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0006",
+    "difficultyScore": 29,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0007",
+    "difficultyScore": 39,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0008",
+    "difficultyScore": 34,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0009",
+    "difficultyScore": 41,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0010",
+    "difficultyScore": 49,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0011",
+    "difficultyScore": 39,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0012",
+    "difficultyScore": 54,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0013",
+    "difficultyScore": 59,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0014",
+    "difficultyScore": 61,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0015",
+    "difficultyScore": 48,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0016",
+    "difficultyScore": 48,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0017",
+    "difficultyScore": 39,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0018",
+    "difficultyScore": 37,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0019",
+    "difficultyScore": 41,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0020",
+    "difficultyScore": 39,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0021",
+    "difficultyScore": 39,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0022",
+    "difficultyScore": 46,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0023",
+    "difficultyScore": 59,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0024",
+    "difficultyScore": 54,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0025",
+    "difficultyScore": 76,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0027",
+    "difficultyScore": 55,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0028",
+    "difficultyScore": 54,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0029",
+    "difficultyScore": 66,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0030",
+    "difficultyScore": 64,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0031",
+    "difficultyScore": 55,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0032",
+    "difficultyScore": 84,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0033",
+    "difficultyScore": 61,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0034",
+    "difficultyScore": 81,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0036",
+    "difficultyScore": 95,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0038",
+    "difficultyScore": 90,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0040",
+    "difficultyScore": 100,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0041",
+    "difficultyScore": 95,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0042",
+    "difficultyScore": 90,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0043",
+    "difficultyScore": 87,
+    "origin": "generated"
+  },
+  {
+    "id": "hand-01",
+    "difficultyScore": 1,
+    "origin": "hand"
+  },
+  {
+    "id": "hand-02",
+    "difficultyScore": 6,
+    "origin": "hand"
+  },
+  {
+    "id": "hand-03",
+    "difficultyScore": 23,
+    "origin": "hand"
+  },
+  {
+    "id": "hand-04",
+    "difficultyScore": 30,
+    "origin": "hand"
+  },
+  {
+    "id": "hand-05",
+    "difficultyScore": 34,
+    "origin": "hand"
+  },
+  {
+    "id": "hand-06",
+    "difficultyScore": 38,
+    "origin": "hand"
+  }
 ]

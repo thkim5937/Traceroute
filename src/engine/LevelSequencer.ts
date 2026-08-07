@@ -1,12 +1,16 @@
-import { loadLevelIndex } from '../data/LevelLoader.ts';
+import type { LevelIndex } from '../data/LevelSchema.ts';
 
-/**
- * Temporary placeholder ordering: the declared order of the level index
- * (src/levels/index.json). Section 6.4 will replace this with real
- * difficulty-based ordering once the solver/scorer exists.
- */
-export function getOrderedLevelIds(): string[] {
-  return loadLevelIndex().map((entry) => entry.id);
+let levelIndex: LevelIndex = [];
+
+/** Injects the level index the sequencer orders by; call once at startup. */
+export function initLevelSequencer(index: LevelIndex): void {
+  levelIndex = index;
+}
+
+function getOrderedLevelIds(): string[] {
+  return [...levelIndex]
+    .sort((a, b) => a.difficultyScore - b.difficultyScore || a.id.localeCompare(b.id))
+    .map((entry) => entry.id);
 }
 
 export function getFirstLevelId(): string {

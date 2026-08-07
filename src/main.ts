@@ -1,11 +1,16 @@
 import './style.css';
-import { renderGrid, renderDots, renderPaths } from './render/CanvasRenderer.ts';
+import {
+  renderGrid,
+  renderDots,
+  renderPaths,
+  renderBlockedCells,
+} from './render/CanvasRenderer.ts';
 import { attachInputHandler } from './render/InputHandler.ts';
 import { detectBounceBackTarget, playBounceBackAnimation } from './render/Animations.ts';
 import { PALETTE } from './palette/palette.ts';
-import { loadLevelById } from './data/LevelLoader.ts';
+import { loadLevelById, loadLevelIndex } from './data/LevelLoader.ts';
 import { createGameController, type GameController } from './engine/GameController.ts';
-import { getFirstLevelId, getNextLevelId } from './engine/LevelSequencer.ts';
+import { getFirstLevelId, getNextLevelId, initLevelSequencer } from './engine/LevelSequencer.ts';
 import {
   createInitialSessionState,
   markLevelCleared,
@@ -17,6 +22,7 @@ import {
   hideClearOverlay,
   setClearOverlayContent,
 } from './ui/ClearOverlay.ts';
+import { createControlBar, setControlBarState } from './ui/ControlBar.ts';
 import type { LevelData } from './data/LevelSchema.ts';
 
 const cellSize = 60;
@@ -31,8 +37,10 @@ let session: SessionState = createInitialSessionState();
 
 function render(): void {
   renderGrid(ctx, level.gridSize, cellSize);
+  renderBlockedCells(ctx, level.obstacles?.blockedCells, cellSize);
   renderDots(ctx, level.colors, cellSize, PALETTE);
   renderPaths(ctx, controller.getState(), level, cellSize, PALETTE);
+  setControlBarState(controlBar, { canUndo: controller.canUndo(), canRedo: controller.canRedo() });
 }
 
 function showLevelClearOverlay(): void {
@@ -70,6 +78,14 @@ function goToNextLevel(): void {
 const overlay = createClearOverlay(goToNextLevel);
 board.appendChild(overlay);
 
+const controlBar = createControlBar({
+  onUndo: () => controller.undo(),
+  onRedo: () => controller.redo(),
+  onClear: () => controller.clearBoard(),
+});
+board.appendChild(controlBar);
+
+initLevelSequencer(loadLevelIndex());
 loadLevel(getFirstLevelId());
 
 attachInputHandler(

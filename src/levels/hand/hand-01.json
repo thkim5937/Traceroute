@@ -1,15 +1,145 @@
 {
   "id": "hand-01",
-  "gridSize": { "rows": 6, "cols": 6 },
+  "gridSize": {
+    "rows": 6,
+    "cols": 6
+  },
   "colors": [
-    { "colorId": "sky", "endpoints": [{ "row": 0, "col": 0 }, { "row": 0, "col": 5 }] },
-    { "colorId": "green", "endpoints": [{ "row": 5, "col": 0 }, { "row": 5, "col": 5 }] },
-    { "colorId": "blue", "endpoints": [{ "row": 2, "col": 0 }, { "row": 4, "col": 4 }] }
+    {
+      "colorId": "sky",
+      "endpoints": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "colorId": "green",
+      "endpoints": [
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "colorId": "blue",
+      "endpoints": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    }
   ],
   "origin": "hand",
   "difficultyTag": "easy",
-  "difficultyScore": 0,
-  "handDraftOrder": 1,
-  "solution": [],
-  "minTotalEdgeLength": 0
+  "difficultyScore": 1,
+  "solution": [
+    {
+      "colorId": "sky",
+      "path": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 0,
+          "col": 1
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "colorId": "green",
+      "path": [
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
+        },
+        {
+          "row": 5,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "colorId": "blue",
+      "path": [
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 0
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 3
+        },
+        {
+          "row": 4,
+          "col": 4
+        }
+      ]
+    }
+  ],
+  "minTotalEdgeLength": 16
 }
