@@ -90,7 +90,7 @@ export function renderDots(
   ctx: CanvasRenderingContext2D,
   colors: {
     colorId: string;
-    endpoints: [{ row: number; col: number }, { row: number; col: number }];
+    endpoints: { row: number; col: number }[];
   }[],
   cellSize: number,
   palette: Record<string, string>,

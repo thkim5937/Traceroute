@@ -21,7 +21,12 @@ export interface Coord {
 export interface LevelData {
   id: string;
   gridSize: { rows: number; cols: number };
-  colors: { colorId: string; endpoints: [Coord, Coord] }[];
+  /**
+   * Design invariant (not enforced by the type system): `endpoints` has length 2
+   * for most colors. Colors introduced from roughly level 20 onward may be
+   * 'multi-endpoint' colors with 3 or 4 endpoints (TRD §5.15).
+   */
+  colors: { colorId: string; endpoints: Coord[] }[];
   /** Distinguishes hand-designed vs procedurally generated levels. */
   origin: 'hand' | 'generated';
   difficultyTag: 'easy' | 'medium' | 'hard';
