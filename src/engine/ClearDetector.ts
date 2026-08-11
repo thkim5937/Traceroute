@@ -13,19 +13,16 @@ function sameCell(a: Coord, b: Coord): boolean {
 
 export function isColorComplete(
   colorState: ColorPathState,
-  colorDef: { colorId: string; endpoints: [Coord, Coord] },
+  colorDef: { colorId: string; endpoints: Coord[] },
 ): boolean {
   const { path } = colorState;
   if (path.length < 2) {
     return false;
   }
-  const first = path[0]!;
-  const last = path[path.length - 1]!;
-  const [endA, endB] = colorDef.endpoints;
-  const endpointsMatch =
-    (sameCell(first, endA) && sameCell(last, endB)) ||
-    (sameCell(first, endB) && sameCell(last, endA));
-  if (!endpointsMatch) {
+  const allEndpointsReached = colorDef.endpoints.every((endpoint) =>
+    path.some((cell) => sameCell(cell, endpoint)),
+  );
+  if (!allEndpointsReached) {
     return false;
   }
   for (let i = 1; i < path.length; i++) {
