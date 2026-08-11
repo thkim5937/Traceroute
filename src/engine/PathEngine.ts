@@ -31,10 +31,7 @@ export function handleCellClick(
     if (color === undefined) {
       return state;
     }
-    if (
-      (clickCell.col === color.endpoints[0].col && clickCell.row === color.endpoints[0].row) ||
-      (clickCell.col === color.endpoints[1].col && clickCell.row === color.endpoints[1].row)
-    ) {
+    if (color.endpoints.some((e) => e.row === clickCell.row && e.col === clickCell.col)) {
       return commit(state, colorId, {
         colorId,
         path: [clickCell],
@@ -80,8 +77,7 @@ export function isOccupiedByOtherColor(
   for (const n of level.colors) {
     if (
       n.colorId !== colorId &&
-      ((n.endpoints[0].row === cell.row && n.endpoints[0].col === cell.col) ||
-        (n.endpoints[1].row === cell.row && n.endpoints[1].col === cell.col))
+      n.endpoints.some((e) => e.row === cell.row && e.col === cell.col)
     ) {
       return true;
     }
@@ -181,8 +177,7 @@ export function resolveColorIdForClick(
   for (const color of level.colors) {
     if (
       state.paths.get(color.colorId) === undefined &&
-      ((color.endpoints[0].col === clickCell.col && color.endpoints[0].row === clickCell.row) ||
-        (color.endpoints[1].col === clickCell.col && color.endpoints[1].row === clickCell.row))
+      color.endpoints.some((e) => e.col === clickCell.col && e.row === clickCell.row)
     ) {
       return color.colorId;
     }
