@@ -61,6 +61,7 @@ h2 {
 
 h1 {
   font-size: 56px;
+  line-height: 118%;
   letter-spacing: -1.68px;
   margin: 32px 0;
   @media (max-width: 1024px) {
@@ -130,14 +131,21 @@ code {
 }
 
 #app {
-  width: 1126px;
-  max-width: 100%;
+  max-width: 560px;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+}
+
+#app-header {
+  display: flex;
+  justify-content: flex-start;
+  padding: 12px 16px;
   box-sizing: border-box;
 }
 
@@ -248,7 +256,14 @@ code {
 
 #board {
   position: relative;
-  display: inline-block;
+  display: block;
+  max-width: 100%;
+}
+
+#game-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .clear-overlay {
@@ -285,7 +300,11 @@ code {
 .control-bar {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 6px;
+}
+
+.control-bar__hint {
+  margin-top: 20px;
 }
 
 .control-bar__button {
@@ -301,6 +320,83 @@ code {
 .control-bar__button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.list-button {
+  padding: 8px 10px;
+  font-size: 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+}
+
+@keyframes control-bar-undo-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-border); }
+  50% { box-shadow: 0 0 0 8px var(--accent-border); }
+}
+
+.control-bar__undo--pulse {
+  animation: control-bar-undo-pulse 0.5s ease-in-out 3;
+}
+
+.level-list-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 6, 13, 0.6);
+  color: #fff;
+}
+
+.level-list-overlay--visible {
+  display: flex;
+}
+
+.level-list-overlay__panel {
+  position: relative;
+  width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  background: var(--bg, #1a1a1a);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.level-list-overlay__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.level-list-overlay__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  text-align: left;
+}
+
+.level-list-overlay__item:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.level-list-overlay__item--current {
+  outline: 2px solid #fff;
+}
+
+.level-list-overlay__stars {
+  font-size: 13px;
+  opacity: 0.85;
 }
 
 .ticks {

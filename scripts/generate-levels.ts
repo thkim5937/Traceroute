@@ -15,9 +15,11 @@ import type { BoardResult } from '../src/generator/BoardGenerator.ts';
 import type { Coord, LevelData, LevelIndex } from '../src/data/LevelSchema.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const HAND_LEVELS_DIR = path.join(__dirname, '../src/levels/hand');
-const GENERATED_LEVELS_DIR = path.join(__dirname, '../src/levels/generated');
-const LEVEL_INDEX_PATH = path.join(__dirname, '../src/levels/index.json');
+// Exported so other pipeline scripts (e.g. generate-weekly-levels.ts) write to
+// the same locations instead of duplicating these paths.
+export const HAND_LEVELS_DIR = path.join(__dirname, '../src/levels/hand');
+export const GENERATED_LEVELS_DIR = path.join(__dirname, '../src/levels/generated');
+export const LEVEL_INDEX_PATH = path.join(__dirname, '../src/levels/index.json');
 const CALIBRATION_CONSTANTS_PATH = path.join(__dirname, '../src/solver/calibrationConstants.ts');
 const HAND_LEVEL_IDS = ['hand-01', 'hand-02', 'hand-03', 'hand-04', 'hand-05', 'hand-06'];
 
@@ -135,11 +137,25 @@ export function randomObstacleBlockedCells(
   return [...rectangle, ...singles];
 }
 
+export interface TierDefinition {
+  gridSize: { rows: number; cols: number };
+  colorCount: number;
+}
+
+// Exported so generate-weekly-levels.ts picks tiers from the same 4-tier
+// gridSize/colorCount table instead of hardcoding its own.
+export const TIER_DEFINITIONS: TierDefinition[] = [
+  { gridSize: { rows: 5, cols: 5 }, colorCount: 5 },
+  { gridSize: { rows: 6, cols: 6 }, colorCount: 6 },
+  { gridSize: { rows: 7, cols: 7 }, colorCount: 7 },
+  { gridSize: { rows: 8, cols: 8 }, colorCount: 8 },
+];
+
 export const GENERATED_LEVEL_SPECS: GeneratedLevelSpec[] = [
-  ...generatedTier(1, 11, { rows: 5, cols: 5 }, 5),
-  ...generatedTier(12, 22, { rows: 6, cols: 6 }, 6),
-  ...generatedTier(23, 33, { rows: 7, cols: 7 }, 7),
-  ...generatedTier(34, 44, { rows: 8, cols: 8 }, 8),
+  ...generatedTier(1, 11, TIER_DEFINITIONS[0]!.gridSize, TIER_DEFINITIONS[0]!.colorCount),
+  ...generatedTier(12, 22, TIER_DEFINITIONS[1]!.gridSize, TIER_DEFINITIONS[1]!.colorCount),
+  ...generatedTier(23, 33, TIER_DEFINITIONS[2]!.gridSize, TIER_DEFINITIONS[2]!.colorCount),
+  ...generatedTier(34, 44, TIER_DEFINITIONS[3]!.gridSize, TIER_DEFINITIONS[3]!.colorCount),
 ].map((spec) => {
   const obstacleCount = OBSTACLE_SPEC_COUNTS[spec.id];
   return obstacleCount === undefined
@@ -194,7 +210,10 @@ function readHandLevel(id: string): LevelData {
   return JSON.parse(raw) as LevelData;
 }
 
-function classifySolverResult(solverResult: SolverResult): {
+// Exported so generate-weekly-levels.ts classifies its own solve() results the
+// same way instead of reimplementing the 'ok' | 'unresolved-after-retries' |
+// 'unsolvable' rules.
+export function classifySolverResult(solverResult: SolverResult): {
   status: RecordStatus;
   rawScore: number;
 } {

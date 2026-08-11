@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getFirstLevelId, getNextLevelId, initLevelSequencer } from '../src/engine/LevelSequencer';
+import {
+  getFirstLevelId,
+  getNextLevelId,
+  getOrderedLevelIds,
+  getResumeLevelId,
+  initLevelSequencer,
+} from '../src/engine/LevelSequencer';
 import type { LevelIndex } from '../src/data/LevelSchema';
 
 const fixture: LevelIndex = [
@@ -34,5 +40,28 @@ describe('getNextLevelId', () => {
 
   it('returns null for an unrecognized level id', () => {
     expect(getNextLevelId('does-not-exist')).toBeNull();
+  });
+});
+
+describe('getOrderedLevelIds', () => {
+  it('returns every level id sorted by difficultyScore, tie-broken by id', () => {
+    expect(getOrderedLevelIds()).toEqual(['hand-01', 'hand-02', 'gen-0001', 'gen-0003']);
+  });
+});
+
+describe('getResumeLevelId', () => {
+  it('returns the first ordered level when nothing is cleared', () => {
+    expect(getResumeLevelId(new Set())).toBe(getFirstLevelId());
+    expect(getResumeLevelId(new Set())).toBe('hand-01');
+  });
+
+  it('returns the first not-cleared level in order, not just any uncleared level', () => {
+    expect(getResumeLevelId(new Set(['hand-01', 'gen-0001']))).toBe('hand-02');
+  });
+
+  it('returns the last ordered level when every level is cleared', () => {
+    expect(getResumeLevelId(new Set(['hand-01', 'hand-02', 'gen-0001', 'gen-0003']))).toBe(
+      'gen-0003',
+    );
   });
 });

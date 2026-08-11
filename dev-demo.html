@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>numberlink — dev demo</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Generator + Solver Live Demo</h1>
+      <p>Dev-only tool. Not linked from the main game.</p>
+      <div id="demo-controls">
+        <label>Rows <input id="demo-rows" type="number" min="2" max="8" value="6" /></label>
+        <label>Cols <input id="demo-cols" type="number" min="2" max="8" value="6" /></label>
+        <label>Color pairs <input id="demo-color-count" type="number" min="1" max="7" value="3" /></label>
+        <button id="demo-generate" type="button">Start Generation</button>
+        <button id="demo-play" type="button">Play This Level</button>
+      </div>
+      <p id="demo-status"></p>
+      <div id="board">
+        <canvas id="game-canvas"></canvas>
+      </div>
+    </div>
+    <script type="module" src="/src/demo-main.ts"></script>
+  </body>
+</html>

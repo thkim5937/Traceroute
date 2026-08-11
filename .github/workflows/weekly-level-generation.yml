@@ -1,0 +1,50 @@
+name: Weekly Level Generation
+
+on:
+  # Placeholder schedule -- easily adjustable, e.g. to a lower-traffic time or
+  # a different day, once the team has a preference.
+  schedule:
+    - cron: '0 0 * * 1' # Monday 00:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Generate weekly levels
+        id: generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set +e
+          npm run generate:weekly-levels
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+      - name: Read summary
+        if: steps.generate.outputs.exit_code == '0'
+        id: summary
+        run: |
+          {
+            echo 'body<<EOF'
+            cat weekly-generation-summary.txt
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+          echo "title=$(head -n 1 weekly-generation-summary.txt)" >> "$GITHUB_OUTPUT"
+      - name: Fail on unexpected error
+        if: steps.generate.outputs.exit_code != '0' && steps.generate.outputs.exit_code != '2'
+        run: exit 1
+      - name: Open pull request
+        if: steps.generate.outputs.exit_code == '0'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: 'Weekly level generation'
+          branch: weekly-level-generation
+          title: ${{ steps.summary.outputs.title }}
+          body: ${{ steps.summary.outputs.body }}
+          add-paths: |
+            src/levels/**/*.json
+          # No auto-merge -- left for manual review by the developer.

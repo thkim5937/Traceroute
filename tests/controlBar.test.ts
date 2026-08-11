@@ -4,7 +4,11 @@ import { createControlBar, setControlBarState } from '../src/ui/ControlBar.ts';
 
 describe('ControlBar', () => {
   it('renders undo, redo, and clear buttons with SVG icons', () => {
-    const bar = createControlBar({ onUndo: vi.fn(), onRedo: vi.fn(), onClear: vi.fn() });
+    const bar = createControlBar({
+      onUndo: vi.fn(),
+      onRedo: vi.fn(),
+      onClear: vi.fn(),
+    });
 
     const undoButton = bar.querySelector('.control-bar__undo');
     const redoButton = bar.querySelector('.control-bar__redo');
@@ -33,7 +37,11 @@ describe('ControlBar', () => {
   });
 
   it('toggles disabled state via setControlBarState', () => {
-    const bar = createControlBar({ onUndo: vi.fn(), onRedo: vi.fn(), onClear: vi.fn() });
+    const bar = createControlBar({
+      onUndo: vi.fn(),
+      onRedo: vi.fn(),
+      onClear: vi.fn(),
+    });
 
     setControlBarState(bar, { canUndo: false, canRedo: false });
     expect(bar.querySelector<HTMLButtonElement>('.control-bar__undo')?.disabled).toBe(true);

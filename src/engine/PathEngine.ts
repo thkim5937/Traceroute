@@ -71,7 +71,7 @@ export function handleCellClick(
   }
 }
 
-function isOccupiedByOtherColor(
+export function isOccupiedByOtherColor(
   state: GameState,
   level: LevelData,
   colorId: string,
@@ -97,7 +97,7 @@ function isOccupiedByOtherColor(
   return false;
 }
 
-function isBlockedCell(level: LevelData, cell: Coord): boolean {
+export function isBlockedCell(level: LevelData, cell: Coord): boolean {
   const blockedCells = level.obstacles?.blockedCells;
   if (blockedCells === undefined) {
     return false;

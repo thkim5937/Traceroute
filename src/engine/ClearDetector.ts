@@ -62,3 +62,26 @@ export function isBoardClear(state: GameState, level: LevelData): boolean {
   }
   return true;
 }
+
+/**
+ * TRD §5.9: total edge count vs. minTotalEdgeLength determines the base
+ * efficiency rating (1-3); each hint used then deducts 0.25, floored at 1.0.
+ */
+export function computeStarRating(
+  state: GameState,
+  level: LevelData,
+  hintUseCount: number,
+): number {
+  let totalEdgeCount = 0;
+  for (const colorDef of level.colors) {
+    const colorState = state.paths.get(colorDef.colorId);
+    totalEdgeCount += (colorState?.path.length ?? 1) - 1;
+  }
+  let efficiencyStars: 1 | 2 | 3;
+  if (totalEdgeCount <= level.minTotalEdgeLength * 1.0) efficiencyStars = 3;
+  else if (totalEdgeCount <= level.minTotalEdgeLength * 1.3) efficiencyStars = 2;
+  else efficiencyStars = 1;
+
+  const finalStars = Math.max(1.0, efficiencyStars - hintUseCount * 0.25);
+  return Math.round(finalStars * 100) / 100;
+}

@@ -45,6 +45,17 @@ export function createControlBar(handlers: ControlBarHandlers): HTMLDivElement {
   return bar;
 }
 
+/**
+ * Briefly highlights the Undo button to guide the player when a hint cannot
+ * make progress (color's tail is stuck). Auto-dismisses after 1.5s.
+ */
+export function pulseUndoButton(controlBar: HTMLElement): void {
+  const btn = controlBar.querySelector('.control-bar__undo');
+  if (!(btn instanceof HTMLElement)) return;
+  btn.classList.add('control-bar__undo--pulse');
+  setTimeout(() => btn.classList.remove('control-bar__undo--pulse'), 1500);
+}
+
 export function setControlBarState(
   bar: HTMLElement,
   state: { canUndo: boolean; canRedo: boolean },

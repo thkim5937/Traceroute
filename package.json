@@ -11,7 +11,11 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "generate:levels": "tsx scripts/generate-levels.ts"
+    "generate:levels": "tsx scripts/generate-levels.ts",
+    "generate:weekly-levels": "tsx scripts/generate-weekly-levels.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -26,5 +30,8 @@
     "typescript-eslint": "^8.65.0",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0"
   }
 }

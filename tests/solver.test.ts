@@ -562,6 +562,97 @@ describe('zero-length colors (start === end)', () => {
   });
 });
 
+describe('initialPaths (hint continuation)', () => {
+  it('omitting initialPaths behaves identically to before (no regression)', () => {
+    const endpoints: [Coord, Coord][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 1, col: 1 },
+      ],
+    ];
+
+    const withoutParam = solve({ rows: 2, cols: 2 }, endpoints);
+    const withUndefinedEntries = solve({ rows: 2, cols: 2 }, endpoints, {}, [], [undefined]);
+
+    expect(withUndefinedEntries).toEqual(withoutParam);
+  });
+
+  it('seeds the search to continue from an initialPath tail rather than its raw endpoint', () => {
+    // Single color, 3x3 grid. Player already drew (0,0)->(1,0) (a detour away
+    // from the raw endpoint) before asking for a hint; the search must
+    // continue from the tail (1,0), not restart from (0,0).
+    const endpoints: [Coord, Coord][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 2, col: 2 },
+      ],
+    ];
+    const initialPaths: (Coord[] | undefined)[] = [
+      [
+        { row: 0, col: 0 },
+        { row: 1, col: 0 },
+      ],
+    ];
+
+    const result = solve({ rows: 3, cols: 3 }, endpoints, {}, [], initialPaths);
+
+    expect(result.status).toBe('solved');
+    const path = result.solution?.[0] ?? [];
+    expect(path.slice(0, 2)).toEqual(initialPaths[0]);
+    expect(path[path.length - 1]).toEqual({ row: 2, col: 2 });
+  });
+
+  it('marks every cell of an initialPath as owned, blocking it from other colors', () => {
+    // Color 0's initialPath occupies the entire top row, including (0,1).
+    // Color 1's target sits at (0,1) -- if those cells weren't marked owned,
+    // color 1 could still claim its own target; since they are owned, color
+    // 1's target is permanently unreachable and the board is unsolvable.
+    const endpoints: [Coord, Coord][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 2, col: 2 },
+      ],
+      [
+        { row: 1, col: 0 },
+        { row: 0, col: 1 },
+      ],
+    ];
+    const initialPaths: (Coord[] | undefined)[] = [
+      [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+      ],
+      undefined,
+    ];
+
+    const result = solve({ rows: 3, cols: 3 }, endpoints, {}, [], initialPaths);
+
+    expect(result.status).toBe('unsolved');
+  });
+
+  it('marks done=true when an initialPath tail already equals the target', () => {
+    const endpoints: [Coord, Coord][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 1, col: 1 },
+      ],
+    ];
+    const initialPaths: (Coord[] | undefined)[] = [
+      [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 1, col: 1 },
+      ],
+    ];
+
+    const result = solve({ rows: 2, cols: 2 }, endpoints, {}, [], initialPaths);
+
+    expect(result.status).toBe('solved');
+    expect(result.solution?.[0]).toEqual(initialPaths[0]);
+  });
+});
+
 describe('blockedCells (TRD §5.14)', () => {
   it('routes around blockedCells to reach the target, never entering one', () => {
     // 3x3 grid, single color from (0,0) to (2,0). The direct straight-down
@@ -584,5 +675,61 @@ describe('blockedCells (TRD §5.14)', () => {
     for (const blocked of blockedCells) {
       expect(path.some((c) => c.row === blocked.row && c.col === blocked.col)).toBe(false);
     }
+  });
+});
+
+describe('onNode callback (TRD §5.10 live demo)', () => {
+  it('fires visit events for forced-move steps, and does not change nodeCount', () => {
+    // Same fully-forced 2x3 grid as the "auto-extends a single-option tail"
+    // heuristics test above: every step is a forced move, nodeCount stays 0,
+    // but onNode should still fire once per forced-move step for visualization.
+    const endpoints: [Coord, Coord][] = [
+      [
+        { row: 1, col: 0 },
+        { row: 0, col: 2 },
+      ],
+      [
+        { row: 1, col: 1 },
+        { row: 1, col: 2 },
+      ],
+    ];
+
+    const events: { type: string; colorIndex: number }[] = [];
+    const result = solve({ rows: 2, cols: 3 }, endpoints, {}, [], undefined, (event) => {
+      events.push(event);
+    });
+
+    expect(result.status).toBe('solved');
+    expect(result.nodeCount).toBe(0);
+    expect(events.filter((e) => e.type === 'visit').length).toBeGreaterThan(0);
+    expect(events.some((e) => e.colorIndex === 0)).toBe(true);
+    expect(events.some((e) => e.colorIndex === 1)).toBe(true);
+
+    // Cross-check: passing onNode must not change nodeCount vs. omitting it.
+    const withoutOnNode = solve({ rows: 2, cols: 3 }, endpoints);
+    expect(withoutOnNode.nodeCount).toBe(result.nodeCount);
+  });
+
+  it('fires backtrack events when a branch is undone', () => {
+    // Structurally unsolvable 2x2 grid (same as the "rejects a color with 0
+    // legal next cells" heuristics test): color 0 must take a real move,
+    // fail, and backtrack.
+    const endpoints: [Coord, Coord][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 1, col: 1 },
+      ],
+      [
+        { row: 0, col: 1 },
+        { row: 1, col: 0 },
+      ],
+    ];
+
+    const events: { type: string; colorIndex: number }[] = [];
+    solve({ rows: 2, cols: 2 }, endpoints, {}, [], undefined, (event) => {
+      events.push(event);
+    });
+
+    expect(events.some((e) => e.type === 'backtrack')).toBe(true);
   });
 });

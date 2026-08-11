@@ -11,10 +11,20 @@ export interface SolverResult {
 export const SOLVER_NODE_LIMIT = 200_000;
 export const SOLVER_TIME_LIMIT_MS = 5000;
 
+export const HINT_SOLVER_NODE_LIMIT = 500_000;
+export const HINT_SOLVER_TIME_LIMIT_MS = 2000;
+
 export interface SolverLimits {
   nodeLimit?: number;
   timeLimitMs?: number;
 }
+
+/** TRD §5.10 live demo: per-step visualization hook, fired on every move applied/undone
+ * during search -- including forced moves -- independent of the nodeCount used for
+ * difficulty scoring (which only counts genuine branch points, see dfs() below). */
+export type SolverNodeEvent =
+  | { type: 'visit'; colorIndex: number; cell: Coord }
+  | { type: 'backtrack'; colorIndex: number; cell: Coord };
 
 const DIRECTIONS: Coord[] = [
   { row: -1, col: 0 },
@@ -103,6 +113,8 @@ export function solve(
   endpoints: [Coord, Coord][],
   limits: SolverLimits = {},
   blockedCells: Coord[] = [],
+  initialPaths?: (Coord[] | undefined)[],
+  onNode?: (event: SolverNodeEvent) => void,
 ): SolverResult {
   const nodeLimit = limits.nodeLimit ?? SOLVER_NODE_LIMIT;
   const timeLimitMs = limits.timeLimitMs ?? SOLVER_TIME_LIMIT_MS;
@@ -115,6 +127,13 @@ export function solve(
     setCellOwner(occupied, cell, -1);
   }
   const paths: Coord[][] = endpoints.map(([start], colorIndex) => {
+    const initialPath = initialPaths?.[colorIndex];
+    if (initialPath !== undefined && initialPath.length > 0) {
+      for (const cell of initialPath) {
+        setCellOwner(occupied, cell, colorIndex);
+      }
+      return initialPath.slice();
+    }
     setCellOwner(occupied, start, colorIndex);
     return [start];
   });
@@ -122,6 +141,11 @@ export function solve(
   for (let colorIndex = 0; colorIndex < colorCount; colorIndex++) {
     const [start, end] = endpoints[colorIndex] ?? [];
     if (start !== undefined && end !== undefined && coordEquals(start, end)) {
+      done[colorIndex] = true;
+      continue;
+    }
+    const tail = paths[colorIndex]?.at(-1);
+    if (tail !== undefined && end !== undefined && coordEquals(tail, end)) {
       done[colorIndex] = true;
     }
   }
@@ -211,6 +235,7 @@ export function solve(
 
     path.push(next);
     setCellOwner(occupied, next, colorIndex);
+    onNode?.({ type: 'visit', colorIndex, cell: next });
     const reachedTarget = coordEquals(next, target);
     if (reachedTarget) {
       done[colorIndex] = true;
@@ -223,6 +248,7 @@ export function solve(
     }
     setCellOwner(occupied, next, undefined);
     path.pop();
+    onNode?.({ type: 'backtrack', colorIndex, cell: next });
 
     return abort;
   }

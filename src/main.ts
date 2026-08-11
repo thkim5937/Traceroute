@@ -10,30 +10,51 @@ import { detectBounceBackTarget, playBounceBackAnimation } from './render/Animat
 import { PALETTE } from './palette/palette.ts';
 import { loadLevelById, loadLevelIndex } from './data/LevelLoader.ts';
 import { createGameController, type GameController } from './engine/GameController.ts';
-import { getFirstLevelId, getNextLevelId, initLevelSequencer } from './engine/LevelSequencer.ts';
+import {
+  getNextLevelId,
+  getOrderedLevelIds,
+  getResumeLevelId,
+  initLevelSequencer,
+} from './engine/LevelSequencer.ts';
 import {
   createInitialSessionState,
   markLevelCleared,
   type SessionState,
 } from './engine/SessionState.ts';
+import { loadSaveData, saveSaveData, applyBestStars } from './engine/ProgressStore.ts';
+import { computeStarRating } from './engine/ClearDetector.ts';
 import {
   createClearOverlay,
   showClearOverlay,
   hideClearOverlay,
   setClearOverlayContent,
 } from './ui/ClearOverlay.ts';
-import { createControlBar, setControlBarState } from './ui/ControlBar.ts';
+import { createControlBar, setControlBarState, pulseUndoButton } from './ui/ControlBar.ts';
+import { createHintButton } from './ui/HintButton.ts';
+import { createListButton, setListButtonOpen } from './ui/ListButton.ts';
+import {
+  createLevelListScreen,
+  renderLevelListScreen,
+  showLevelListScreen,
+  hideLevelListScreen,
+  isLevelListScreenVisible,
+} from './ui/LevelListScreen.ts';
 import type { LevelData } from './data/LevelSchema.ts';
 
 const cellSize = 60;
 
+const appHeader = document.getElementById('app-header') as HTMLElement;
 const board = document.getElementById('board') as HTMLElement;
 const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 
 let level: LevelData;
 let controller: GameController;
-let session: SessionState = createInitialSessionState();
+const saveData = loadSaveData();
+let session: SessionState = saveData.clearedLevelIds.reduce(
+  markLevelCleared,
+  createInitialSessionState(),
+);
 
 function render(): void {
   renderGrid(ctx, level.gridSize, cellSize);
@@ -46,6 +67,15 @@ function render(): void {
 function showLevelClearOverlay(): void {
   session = markLevelCleared(session, level.id);
   console.log('Cleared levels this session:', Array.from(session.clearedLevelIds));
+
+  const newStars = computeStarRating(controller.getState(), level, controller.getHintUseCount());
+  saveData.bestStars = applyBestStars(saveData.bestStars, level.id, newStars);
+
+  saveSaveData({
+    version: 1,
+    clearedLevelIds: Array.from(session.clearedLevelIds),
+    bestStars: saveData.bestStars,
+  });
 
   const isLastLevel = getNextLevelId(level.id) === null;
   setClearOverlayContent(
@@ -61,8 +91,12 @@ function loadLevel(id: string): void {
   level = loadLevelById(id);
   canvas.width = level.gridSize.cols * cellSize;
   canvas.height = level.gridSize.rows * cellSize;
-  controller = createGameController(level, render, showLevelClearOverlay, () =>
-    hideClearOverlay(overlay),
+  controller = createGameController(
+    level,
+    render,
+    showLevelClearOverlay,
+    () => hideClearOverlay(overlay),
+    () => pulseUndoButton(controlBar),
   );
   hideClearOverlay(overlay);
   render();
@@ -75,8 +109,39 @@ function goToNextLevel(): void {
   }
 }
 
+function openLevelList(): void {
+  renderLevelListScreen(
+    levelListOverlay,
+    getOrderedLevelIds(),
+    session.clearedLevelIds,
+    level.id,
+    saveData.bestStars,
+  );
+  showLevelListScreen(levelListOverlay);
+  setListButtonOpen(listButton, true);
+}
+
+function closeLevelList(): void {
+  hideLevelListScreen(levelListOverlay);
+  setListButtonOpen(listButton, false);
+}
+
+function toggleLevelList(): void {
+  if (isLevelListScreenVisible(levelListOverlay)) {
+    closeLevelList();
+  } else {
+    openLevelList();
+  }
+}
+
 const overlay = createClearOverlay(goToNextLevel);
 board.appendChild(overlay);
+
+const levelListOverlay = createLevelListScreen((id) => {
+  loadLevel(id);
+  closeLevelList();
+});
+board.appendChild(levelListOverlay);
 
 const controlBar = createControlBar({
   onUndo: () => controller.undo(),
@@ -85,8 +150,14 @@ const controlBar = createControlBar({
 });
 board.appendChild(controlBar);
 
+const hintButton = createHintButton(() => controller);
+board.appendChild(hintButton);
+
+const listButton = createListButton(toggleLevelList);
+appHeader.appendChild(listButton);
+
 initLevelSequencer(loadLevelIndex());
-loadLevel(getFirstLevelId());
+loadLevel(getResumeLevelId(session.clearedLevelIds));
 
 attachInputHandler(
   canvas,
