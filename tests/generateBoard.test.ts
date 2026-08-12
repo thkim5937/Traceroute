@@ -127,3 +127,78 @@ describe('generateBoard', () => {
     expect(result.attemptsUsed).toBe(retryLimit);
   });
 });
+
+describe('generateBoard with multiEndpointRequests', () => {
+  function straightPath(length: number): { row: number; col: number }[] {
+    return Array.from({ length }, (_, col) => ({ row: 0, col }));
+  }
+
+  it('upgrades exactly one color to 3 endpoints, leaves the others at 2', () => {
+    const gridSize = { rows: 6, cols: 6 };
+    const colorCount = 3;
+    const colorPaths = [straightPath(12), straightPath(12), straightPath(12)];
+    const fillGridWithRetryMock = vi.fn((): FillResult => ({
+      gridSize,
+      colorCount,
+      success: true,
+      colorPaths,
+      occupied: [],
+      attemptsUsed: 1,
+    }));
+
+    const result = generateBoard(
+      gridSize,
+      colorCount,
+      undefined,
+      undefined,
+      { fillGridWithRetry: fillGridWithRetryMock },
+      undefined,
+      [3],
+    );
+
+    expect(result.success).toBe(true);
+    const lengths = (result.endpoints ?? []).map((e) => e.length);
+    expect(lengths.filter((l) => l === 3)).toHaveLength(1);
+    expect(lengths.filter((l) => l === 2)).toHaveLength(2);
+  });
+
+  it('retries up to retryLimit and fails when the requested endpoint count cannot fit', () => {
+    const gridSize = { rows: 6, cols: 6 };
+    const colorCount = 2;
+    const colorPaths = [straightPath(4), straightPath(4)];
+    const retryLimit = 3;
+    const fillGridWithRetryMock = vi.fn((): FillResult => ({
+      gridSize,
+      colorCount,
+      success: true,
+      colorPaths,
+      occupied: [],
+      attemptsUsed: 1,
+    }));
+
+    const result = generateBoard(
+      gridSize,
+      colorCount,
+      undefined,
+      retryLimit,
+      { fillGridWithRetry: fillGridWithRetryMock },
+      undefined,
+      [4],
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.attemptsUsed).toBe(retryLimit);
+    expect(fillGridWithRetryMock).toHaveBeenCalledTimes(retryLimit);
+  });
+
+  it("omitted multiEndpointRequests still returns today's 2-element endpoint pairs", () => {
+    const gridSize = { rows: 6, cols: 6 };
+    const colorCount = 1;
+    const result = generateBoard(gridSize, colorCount);
+
+    expect(result.success).toBe(true);
+    for (const pair of result.endpoints ?? []) {
+      expect(pair).toHaveLength(2);
+    }
+  });
+});

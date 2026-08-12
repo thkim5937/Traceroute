@@ -220,3 +220,58 @@ describe('computeStarRating hint penalty', () => {
     expect(computeStarRating(clearedState, perfectLevel, 100)).toBe(1);
   });
 });
+
+describe('multi-endpoint isColorComplete (TRD §5.15)', () => {
+  const multiEndpointColor = {
+    colorId: 'a',
+    endpoints: [
+      { row: 0, col: 0 },
+      { row: 0, col: 2 },
+      { row: 2, col: 0 },
+    ],
+  };
+
+  it('is true when the path visits all 3 endpoints regardless of order', () => {
+    const colorState: ColorPathState = {
+      colorId: 'a',
+      path: [
+        { row: 2, col: 0 },
+        { row: 1, col: 0 },
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+      ],
+      completed: false,
+    };
+
+    expect(isColorComplete(colorState, multiEndpointColor)).toBe(true);
+  });
+
+  it('is false when only 2 of the 3 endpoints have been visited', () => {
+    const colorState: ColorPathState = {
+      colorId: 'a',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 1 },
+        { row: 0, col: 2 },
+      ],
+      completed: false,
+    };
+
+    expect(isColorComplete(colorState, multiEndpointColor)).toBe(false);
+  });
+
+  it('is false if adjacency is broken, even though all 3 endpoints are present in the path array', () => {
+    const colorState: ColorPathState = {
+      colorId: 'a',
+      path: [
+        { row: 0, col: 0 },
+        { row: 0, col: 2 },
+        { row: 2, col: 0 },
+      ],
+      completed: false,
+    };
+
+    expect(isColorComplete(colorState, multiEndpointColor)).toBe(false);
+  });
+});

@@ -110,7 +110,7 @@ type ColorScan =
  */
 export function solve(
   gridSize: { rows: number; cols: number },
-  endpoints: [Coord, Coord][],
+  endpoints: Coord[][],
   limits: SolverLimits = {},
   blockedCells: Coord[] = [],
   initialPaths?: (Coord[] | undefined)[],
@@ -126,7 +126,8 @@ export function solve(
   for (const cell of blockedCells) {
     setCellOwner(occupied, cell, -1);
   }
-  const paths: Coord[][] = endpoints.map(([start], colorIndex) => {
+  const paths: Coord[][] = endpoints.map((ends, colorIndex) => {
+    const start = ends[0];
     const initialPath = initialPaths?.[colorIndex];
     if (initialPath !== undefined && initialPath.length > 0) {
       for (const cell of initialPath) {
@@ -134,20 +135,22 @@ export function solve(
       }
       return initialPath.slice();
     }
+    if (start === undefined) {
+      return [];
+    }
     setCellOwner(occupied, start, colorIndex);
     return [start];
   });
+  // Per-color set of endpoints not yet visited by the path -- a color is
+  // done when this set is empty, regardless of the order its endpoints were
+  // reached in (TRD §5.15 Phase 2).
+  const remainingEndpoints: Coord[][] = endpoints.map((ends, colorIndex) => {
+    const path = paths[colorIndex] ?? [];
+    return ends.filter((endpoint) => !path.some((cell) => coordEquals(cell, endpoint)));
+  });
   const done = new Array<boolean>(colorCount).fill(false);
   for (let colorIndex = 0; colorIndex < colorCount; colorIndex++) {
-    const [start, end] = endpoints[colorIndex] ?? [];
-    if (start !== undefined && end !== undefined && coordEquals(start, end)) {
-      done[colorIndex] = true;
-      continue;
-    }
-    const tail = paths[colorIndex]?.at(-1);
-    if (tail !== undefined && end !== undefined && coordEquals(tail, end)) {
-      done[colorIndex] = true;
-    }
+    done[colorIndex] = remainingEndpoints[colorIndex]?.length === 0;
   }
 
   let nodeCount = 0;
@@ -219,32 +222,39 @@ export function solve(
     for (let colorIndex = 0; colorIndex < colorCount; colorIndex++) {
       if (done[colorIndex]) continue;
       const tail = paths[colorIndex]?.at(-1);
-      const target = endpoints[colorIndex]?.[1];
-      if (tail === undefined || target === undefined) continue;
-      if (!canReach(colorIndex, tail, target)) return true;
+      const remaining = remainingEndpoints[colorIndex];
+      if (tail === undefined || remaining === undefined) continue;
+      for (const target of remaining) {
+        if (!canReach(colorIndex, tail, target)) return true;
+      }
     }
     return false;
   }
 
   function applyMoveAndRecurse(colorIndex: number, next: Coord): boolean {
     const path = paths[colorIndex];
-    const target = endpoints[colorIndex]?.[1];
-    if (path === undefined || target === undefined) {
+    const remaining = remainingEndpoints[colorIndex];
+    if (path === undefined || remaining === undefined) {
       return false;
     }
 
     path.push(next);
     setCellOwner(occupied, next, colorIndex);
     onNode?.({ type: 'visit', colorIndex, cell: next });
-    const reachedTarget = coordEquals(next, target);
-    if (reachedTarget) {
-      done[colorIndex] = true;
+
+    const removedIndex = remaining.findIndex((endpoint) => coordEquals(endpoint, next));
+    const removedEndpoint = removedIndex !== -1 ? remaining[removedIndex] : undefined;
+    const previousDone = done[colorIndex] ?? false;
+    if (removedEndpoint !== undefined) {
+      remaining.splice(removedIndex, 1);
+      done[colorIndex] = remaining.length === 0;
     }
 
     const abort = dfs();
 
-    if (reachedTarget) {
-      done[colorIndex] = false;
+    if (removedEndpoint !== undefined) {
+      remaining.splice(removedIndex, 0, removedEndpoint);
+      done[colorIndex] = previousDone;
     }
     setCellOwner(occupied, next, undefined);
     path.pop();

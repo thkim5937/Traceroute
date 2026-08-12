@@ -33,7 +33,7 @@ export interface FillResult {
 
 export interface BoardResult {
   success: boolean;
-  endpoints?: [Coord, Coord][];
+  endpoints?: Coord[][];
   attemptsUsed: number;
 }
 
@@ -271,31 +271,49 @@ export function fillGridWithRetry(
   };
 }
 
-export function generateBoard(
-  gridSize: { rows: number; cols: number },
-  colorCount: number,
-  onStep?: (event: GenerationStepEvent) => void,
-  retryLimit: number = GENERATOR_RETRY_LIMIT,
-  deps: { fillGridWithRetry: typeof fillGridWithRetry } = { fillGridWithRetry },
-  blockedCells?: Coord[],
-): BoardResult {
-  const fillResult = deps.fillGridWithRetry(
-    gridSize,
-    colorCount,
-    onStep,
-    retryLimit,
-    undefined,
-    blockedCells,
-  );
+export const MIN_ENDPOINT_GAP = 2;
 
-  if (!fillResult.success || fillResult.colorPaths === undefined) {
-    return {
-      success: false,
-      attemptsUsed: fillResult.attemptsUsed,
-    };
+export function selectMultiEndpoints(path: Coord[], endpointCount: number): Coord[] | undefined {
+  const lastIndex = path.length - 1;
+  const indices: number[] = [];
+  for (let i = 0; i < endpointCount; i++) {
+    indices.push(Math.round((i * lastIndex) / (endpointCount - 1)));
   }
 
-  const endpoints: [Coord, Coord][] = fillResult.colorPaths.map((path) => {
+  for (let i = 1; i < indices.length; i++) {
+    const prev = indices[i - 1];
+    const curr = indices[i];
+    if (prev === undefined || curr === undefined || curr - prev < MIN_ENDPOINT_GAP + 1) {
+      return undefined;
+    }
+  }
+
+  return indices.map((index) => {
+    const cell = path[index];
+    if (cell === undefined) {
+      throw new Error('selectMultiEndpoints: index out of range despite bounds check');
+    }
+    return cell;
+  });
+}
+
+function shuffledIndices(count: number): number[] {
+  const indices = Array.from({ length: count }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const a = indices[i];
+    const b = indices[j];
+    if (a === undefined || b === undefined) {
+      continue;
+    }
+    indices[i] = b;
+    indices[j] = a;
+  }
+  return indices;
+}
+
+function defaultEndpoints(colorPaths: Coord[][]): Coord[][] {
+  return colorPaths.map((path) => {
     const start = path[0];
     const end = path[path.length - 1];
     if (start === undefined || end === undefined) {
@@ -303,10 +321,93 @@ export function generateBoard(
     }
     return [start, end];
   });
+}
 
+export function generateBoard(
+  gridSize: { rows: number; cols: number },
+  colorCount: number,
+  onStep?: (event: GenerationStepEvent) => void,
+  retryLimit: number = GENERATOR_RETRY_LIMIT,
+  deps: { fillGridWithRetry: typeof fillGridWithRetry } = { fillGridWithRetry },
+  blockedCells?: Coord[],
+  multiEndpointRequests?: number[],
+): BoardResult {
+  if (multiEndpointRequests === undefined || multiEndpointRequests.length === 0) {
+    const fillResult = deps.fillGridWithRetry(
+      gridSize,
+      colorCount,
+      onStep,
+      retryLimit,
+      undefined,
+      blockedCells,
+    );
+
+    if (!fillResult.success || fillResult.colorPaths === undefined) {
+      return {
+        success: false,
+        attemptsUsed: fillResult.attemptsUsed,
+      };
+    }
+
+    return {
+      success: true,
+      endpoints: defaultEndpoints(fillResult.colorPaths),
+      attemptsUsed: fillResult.attemptsUsed,
+    };
+  }
+
+  for (let attempt = 1; attempt <= retryLimit; attempt++) {
+    if (attempt > 1) {
+      onStep?.({ type: 'retry', attemptNumber: attempt });
+    }
+
+    const fillResult = deps.fillGridWithRetry(
+      gridSize,
+      colorCount,
+      onStep,
+      1,
+      undefined,
+      blockedCells,
+    );
+    if (!fillResult.success || fillResult.colorPaths === undefined) {
+      continue;
+    }
+
+    const endpoints = defaultEndpoints(fillResult.colorPaths);
+    const chosenCount = Math.min(multiEndpointRequests.length, colorCount);
+    const chosenIndices = shuffledIndices(colorCount).slice(0, chosenCount);
+
+    let allChosenSucceeded = true;
+    for (let i = 0; i < chosenIndices.length; i++) {
+      const colorIndex = chosenIndices[i];
+      const requestedCount = multiEndpointRequests[i];
+      if (colorIndex === undefined || requestedCount === undefined) {
+        continue;
+      }
+      const path = fillResult.colorPaths[colorIndex];
+      const selected = path === undefined ? undefined : selectMultiEndpoints(path, requestedCount);
+      if (selected === undefined) {
+        allChosenSucceeded = false;
+        break;
+      }
+      endpoints[colorIndex] = selected;
+    }
+
+    if (allChosenSucceeded) {
+      return {
+        success: true,
+        endpoints,
+        attemptsUsed: attempt,
+      };
+    }
+  }
+
+  console.warn(
+    `generateBoard: failed to fill grid with requested multi-endpoint colors after ${retryLimit} attempts ` +
+      `(gridSize=${JSON.stringify(gridSize)}, colorCount=${colorCount})`,
+  );
   return {
-    success: true,
-    endpoints,
-    attemptsUsed: fillResult.attemptsUsed,
+    success: false,
+    attemptsUsed: retryLimit,
   };
 }

@@ -10,6 +10,8 @@ import {
   buildLevelIndex,
   randomObstacleRectangle,
   randomObstacleBlockedCells,
+  randomMultiEndpointRequests,
+  classifySolverResult,
   type LevelSpecRecord,
 } from '../scripts/generate-levels';
 import { scoreDifficulty } from '../src/solver/DifficultyScorer';
@@ -506,6 +508,43 @@ describe('assembleLevelBatch (Phase 2: Normalize + assemble)', () => {
 
     const nonObstacleLevel = result.levels.find((l) => l.id === 'gen-A')!;
     expect(nonObstacleLevel.obstacles).toBeUndefined();
+  });
+});
+
+describe('multi-endpoint pipeline wiring (TRD §5.15)', () => {
+  it('randomMultiEndpointRequests() always returns 1-2 entries, each 3 or 4', () => {
+    for (let i = 0; i < 50; i++) {
+      const result = randomMultiEndpointRequests();
+      expect([1, 2]).toContain(result.length);
+      for (const entry of result) {
+        expect([3, 4]).toContain(entry);
+      }
+    }
+  });
+
+  it('classifySolverResult returns unsolvable/0 when solution is undefined, regardless of status', () => {
+    const statuses: SolverResult['status'][] = ['solved', 'unresolved', 'unsolvable'];
+    for (const status of statuses) {
+      const result = classifySolverResult({
+        status,
+        solution: undefined,
+        nodeCount: 5,
+        searchFullyCompleted: true,
+      } as SolverResult);
+      expect(result).toEqual({ status: 'unsolvable', rawScore: 0 });
+    }
+  });
+
+  it('attaches multiEndpointRequests only to tier 3-4 specs (gen-0023 and above)', () => {
+    for (const spec of GENERATED_LEVEL_SPECS) {
+      const num = Number(spec.id.slice('gen-'.length));
+      if (num < 23) {
+        expect(spec.multiEndpointRequests).toBeUndefined();
+      } else {
+        expect(Array.isArray(spec.multiEndpointRequests)).toBe(true);
+        expect(spec.multiEndpointRequests!.length).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

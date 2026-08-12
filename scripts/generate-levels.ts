@@ -43,6 +43,8 @@ export interface GeneratedLevelSpec {
   colorCount: number;
   /** TRD §5.14/§5.11: v1 obstacle support, populated for 30 of the 44 generated specs. */
   blockedCells?: Coord[];
+  /** TRD §5.15: Multi-Endpoint Colors requests, populated for tier 3 and tier 4 specs. */
+  multiEndpointRequests?: number[];
 }
 
 function generatedTier(
@@ -137,6 +139,16 @@ export function randomObstacleBlockedCells(
   return [...rectangle, ...singles];
 }
 
+// TRD §5.15: for tier 3/4 specs, request 1-2 multi-endpoint colors, each with 3 or 4 endpoints.
+export function randomMultiEndpointRequests(): number[] {
+  const count = Math.random() < 0.5 ? 1 : 2;
+  const requests: number[] = [];
+  for (let i = 0; i < count; i++) {
+    requests.push(Math.random() < 0.5 ? 3 : 4);
+  }
+  return requests;
+}
+
 export interface TierDefinition {
   gridSize: { rows: number; cols: number };
   colorCount: number;
@@ -158,9 +170,14 @@ export const GENERATED_LEVEL_SPECS: GeneratedLevelSpec[] = [
   ...generatedTier(34, 44, TIER_DEFINITIONS[3]!.gridSize, TIER_DEFINITIONS[3]!.colorCount),
 ].map((spec) => {
   const obstacleCount = OBSTACLE_SPEC_COUNTS[spec.id];
-  return obstacleCount === undefined
-    ? spec
-    : { ...spec, blockedCells: randomObstacleBlockedCells(spec.gridSize, obstacleCount) };
+  const withBlockedCells =
+    obstacleCount === undefined
+      ? spec
+      : { ...spec, blockedCells: randomObstacleBlockedCells(spec.gridSize, obstacleCount) };
+  const specNum = Number(spec.id.slice('gen-'.length));
+  return specNum >= 23
+    ? { ...withBlockedCells, multiEndpointRequests: randomMultiEndpointRequests() }
+    : withBlockedCells;
 });
 
 // Section 6 (difficulty floor): minimum solver-computed rawScore required per major
@@ -188,7 +205,7 @@ export interface LevelSpecRecord {
   id: string;
   origin: 'hand' | 'generated';
   gridSize: { rows: number; cols: number };
-  endpoints?: [Coord, Coord][];
+  endpoints?: Coord[][];
   /** Hand levels only: positional colorId for each endpoint pair, since hand levels don't go through assignColorIds again. */
   colorIds?: string[];
   solverResult?: SolverResult;
@@ -217,6 +234,9 @@ export function classifySolverResult(solverResult: SolverResult): {
   status: RecordStatus;
   rawScore: number;
 } {
+  if (solverResult.solution === undefined) {
+    return { status: 'unsolvable', rawScore: 0 };
+  }
   const rawScore = computeRawScore(solverResult.solution);
   if (solverResult.status === 'solved') return { status: 'ok', rawScore };
   if (solverResult.status === 'unresolved') {
@@ -245,6 +265,7 @@ export function collectGeneratedRecord(
     blockedCells,
     PIPELINE_SOLVER_LIMITS,
     minRawScoreThreshold,
+    spec.multiEndpointRequests,
   );
 
   for (
@@ -263,6 +284,7 @@ export function collectGeneratedRecord(
       blockedCells,
       PIPELINE_SOLVER_LIMITS,
       minRawScoreThreshold,
+      spec.multiEndpointRequests,
     );
   }
 

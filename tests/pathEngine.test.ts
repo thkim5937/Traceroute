@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { handleCellClick, handleGridClick, resolveColorIdForClick } from '../src/engine/PathEngine';
+import {
+  handleCellClick,
+  handleGridClick,
+  resolveColorIdForClick,
+  isOccupiedByOtherColor,
+} from '../src/engine/PathEngine';
 import type { GameState } from '../src/engine/GameState';
 import type { LevelData } from '../src/data/LevelSchema';
 
@@ -930,5 +935,87 @@ describe('handleGridClick', () => {
 
     expect(result).toBe(state);
     expect(resolveColorIdForClick(state, level, { row: 1, col: 1 })).toBeUndefined();
+  });
+});
+
+describe('multi-endpoint colors (TRD §5.15)', () => {
+  const multiEndpointLevel: LevelData = {
+    id: 'test-level-multi-endpoint',
+    gridSize: { rows: 3, cols: 3 },
+    colors: [
+      {
+        colorId: 'a',
+        endpoints: [
+          { row: 0, col: 0 },
+          { row: 0, col: 2 },
+          { row: 2, col: 0 },
+        ],
+      },
+    ],
+    origin: 'hand',
+    difficultyTag: 'easy',
+    difficultyScore: 0,
+    solution: [],
+    minTotalEdgeLength: 0,
+  };
+
+  it('handleCellClick starts a new path when clicking the third endpoint of an unstarted color', () => {
+    const state: GameState = {
+      levelId: 'test-level-multi-endpoint',
+      paths: new Map(),
+      activeColorId: null,
+    };
+
+    const result = handleCellClick(state, multiEndpointLevel, 'a', { row: 2, col: 0 });
+
+    expect(result.paths.get('a')?.path).toEqual([{ row: 2, col: 0 }]);
+    expect(result.activeColorId).toBe('a');
+  });
+
+  it("isOccupiedByOtherColor returns true when a cell matches another color's third endpoint", () => {
+    const level: LevelData = {
+      id: 'test-level-multi-endpoint-occupied',
+      gridSize: { rows: 3, cols: 3 },
+      colors: [
+        {
+          colorId: 'a',
+          endpoints: [
+            { row: 0, col: 0 },
+            { row: 0, col: 2 },
+            { row: 2, col: 0 },
+          ],
+        },
+        {
+          colorId: 'b',
+          endpoints: [
+            { row: 1, col: 1 },
+            { row: 2, col: 2 },
+          ],
+        },
+      ],
+      origin: 'hand',
+      difficultyTag: 'easy',
+      difficultyScore: 0,
+      solution: [],
+      minTotalEdgeLength: 0,
+    };
+
+    const state: GameState = {
+      levelId: 'test-level-multi-endpoint-occupied',
+      paths: new Map(),
+      activeColorId: null,
+    };
+
+    expect(isOccupiedByOtherColor(state, level, 'b', { row: 2, col: 0 })).toBe(true);
+  });
+
+  it('resolveColorIdForClick resolves to an unstarted color when the click lands on its third endpoint', () => {
+    const state: GameState = {
+      levelId: 'test-level-multi-endpoint',
+      paths: new Map(),
+      activeColorId: null,
+    };
+
+    expect(resolveColorIdForClick(state, multiEndpointLevel, { row: 2, col: 0 })).toBe('a');
   });
 });

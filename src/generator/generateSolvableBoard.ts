@@ -23,6 +23,7 @@ export function generateSolvableBoard(
   blockedCells?: Coord[],
   limits?: SolverLimits,
   minRawScoreThreshold?: number,
+  multiEndpointRequests?: number[],
 ): SolvableBoardResult {
   let totalUsed = 0;
 
@@ -32,14 +33,18 @@ export function generateSolvableBoard(
       return { status: 'failed', totalAttemptsUsed: totalUsed };
     }
 
-    const boardResult = deps.generateBoard(
-      gridSize,
-      colorCount,
-      onStep,
-      remaining,
-      undefined,
-      blockedCells,
-    );
+    const boardResult =
+      multiEndpointRequests === undefined
+        ? deps.generateBoard(gridSize, colorCount, onStep, remaining, undefined, blockedCells)
+        : deps.generateBoard(
+            gridSize,
+            colorCount,
+            onStep,
+            remaining,
+            undefined,
+            blockedCells,
+            multiEndpointRequests,
+          );
     totalUsed += boardResult.attemptsUsed;
 
     if (!boardResult.success || boardResult.endpoints === undefined) {

@@ -733,3 +733,83 @@ describe('onNode callback (TRD §5.10 live demo)', () => {
     expect(events.some((e) => e.type === 'backtrack')).toBe(true);
   });
 });
+
+describe('multi-endpoint colors (TRD §5.15 Phase 2)', () => {
+  it('solves a single-color puzzle where the path must visit 3 endpoints', () => {
+    // 1x5 strip, single color with 3 endpoints: start (0,0), and two more
+    // at (0,2) and (0,4). The only possible path is the full straight line
+    // 0->1->2->3->4, which necessarily passes through the middle endpoint
+    // along the way to the last one.
+    const endpoints: Coord[][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 0, col: 4 },
+        { row: 0, col: 2 },
+      ],
+    ];
+
+    const result = solve({ rows: 1, cols: 5 }, endpoints);
+
+    expect(result.status).toBe('solved');
+    const path = result.solution?.[0] ?? [];
+    expect(path[0]).toEqual({ row: 0, col: 0 });
+    expect(path[path.length - 1]).toEqual({ row: 0, col: 4 });
+    for (const endpoint of endpoints[0] ?? []) {
+      expect(path.some((c) => c.row === endpoint.row && c.col === endpoint.col)).toBe(true);
+    }
+  });
+
+  it('returns unsolved when one of 3 endpoints is walled off by blockedCells', () => {
+    // 3x3 grid, single color with endpoints (0,0), (0,2), (2,2). Blocking
+    // both neighbors of the corner (2,2) -- (1,2) and (2,1) -- isolates it
+    // completely, so no path can ever reach it.
+    const blockedCells: Coord[] = [
+      { row: 1, col: 2 },
+      { row: 2, col: 1 },
+    ];
+    const endpoints: Coord[][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 0, col: 2 },
+        { row: 2, col: 2 },
+      ],
+    ];
+
+    const result = solve({ rows: 3, cols: 3 }, endpoints, {}, blockedCells);
+
+    expect(result.status).toBe('unsolved');
+    expect(result.hasSolution).toBe(false);
+  });
+
+  it('finds a solution regardless of which endpoint is declared as the start (visiting order is not fixed)', () => {
+    // Same 1x5 strip and same 3 coordinates as above, but the declared
+    // start endpoint (endpoints[...][0]) is flipped between the two
+    // scenarios, forcing the path to be traversed -- and its endpoints
+    // visited -- in opposite orders.
+    const leftToRight: Coord[][] = [
+      [
+        { row: 0, col: 0 },
+        { row: 0, col: 2 },
+        { row: 0, col: 4 },
+      ],
+    ];
+    const rightToLeft: Coord[][] = [
+      [
+        { row: 0, col: 4 },
+        { row: 0, col: 2 },
+        { row: 0, col: 0 },
+      ],
+    ];
+
+    const resultA = solve({ rows: 1, cols: 5 }, leftToRight);
+    const resultB = solve({ rows: 1, cols: 5 }, rightToLeft);
+
+    expect(resultA.status).toBe('solved');
+    expect(resultA.solution?.[0]?.[0]).toEqual({ row: 0, col: 0 });
+    expect(resultA.solution?.[0]?.at(-1)).toEqual({ row: 0, col: 4 });
+
+    expect(resultB.status).toBe('solved');
+    expect(resultB.solution?.[0]?.[0]).toEqual({ row: 0, col: 4 });
+    expect(resultB.solution?.[0]?.at(-1)).toEqual({ row: 0, col: 0 });
+  });
+});
