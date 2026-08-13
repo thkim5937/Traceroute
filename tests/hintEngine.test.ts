@@ -536,6 +536,137 @@ describe('applyHint', () => {
   });
 });
 
+// ── applyHint multi-endpoint tests (TRD §5.15 Phase 2) ───────────────────────
+
+describe('applyHint with multi-endpoint colors', () => {
+  // 3x3 grid, single color "sky" with 3 endpoints. Stored solution path visits
+  // them in declaration order: (0,0) -> (2,0) -> (0,2).
+  const multiLevel: LevelData = {
+    id: 'multi-hint-test',
+    gridSize: { rows: 3, cols: 3 },
+    colors: [
+      {
+        colorId: 'sky',
+        endpoints: [
+          { row: 0, col: 0 },
+          { row: 2, col: 0 },
+          { row: 0, col: 2 },
+        ],
+      },
+    ],
+    origin: 'hand',
+    difficultyTag: 'easy',
+    difficultyScore: 0,
+    solution: [
+      {
+        colorId: 'sky',
+        path: [
+          { row: 0, col: 0 },
+          { row: 1, col: 0 },
+          { row: 2, col: 0 },
+          { row: 2, col: 1 },
+          { row: 2, col: 2 },
+          { row: 1, col: 2 },
+          { row: 0, col: 2 },
+        ],
+      },
+    ],
+    minTotalEdgeLength: 0,
+  };
+
+  function multiState(
+    path: { row: number; col: number }[],
+    completed = false,
+  ): GameState {
+    const paths = new Map<string, ColorPathState>();
+    paths.set('sky', { colorId: 'sky', path, completed });
+    return { levelId: multiLevel.id, paths, activeColorId: 'sky' };
+  }
+
+  it('fast path: repeated hints visit all 3 endpoints across multiple clicks, then noop', () => {
+    let state: GameState = { levelId: multiLevel.id, paths: new Map(), activeColorId: 'sky' };
+    let finalPath: { row: number; col: number }[] | null = null;
+    for (let i = 0; i < 10; i++) {
+      const r = applyHint(multiLevel, 'sky', state);
+      if (r.status !== 'revealed') break;
+      finalPath = r.newPath;
+      state = multiState(r.newPath);
+    }
+    expect(finalPath).not.toBeNull();
+    // All 3 declared endpoints must appear somewhere in the final revealed path.
+    for (const endpoint of multiLevel.colors[0]!.endpoints) {
+      expect(finalPath!.some((c) => c.row === endpoint.row && c.col === endpoint.col)).toBe(true);
+    }
+    expect(solveMock).not.toHaveBeenCalled();
+
+    // One more click on the now-fully-visited color is a noop.
+    const finalState = multiState(finalPath!);
+    expect(applyHint(multiLevel, 'sky', finalState).status).toBe('noop');
+  });
+
+  it('noop is order-independent: all 3 endpoints present anywhere in the path, regardless of visit order', () => {
+    // Visits (2,0) first, then (0,0), then (0,2) last -- reverse of
+    // declaration order. isColorComplete-style membership check doesn't care.
+    const outOfOrderPath = [
+      { row: 2, col: 0 },
+      { row: 1, col: 0 },
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ];
+    expect(applyHint(multiLevel, 'sky', multiState(outOfOrderPath)).status).toBe('noop');
+  });
+
+  it('partial visitation (2 of 3 endpoints) is not a noop -- hint keeps going', () => {
+    // Player has reached (0,0) and (2,0) but not yet (0,2).
+    const partialPath = [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 2, col: 0 },
+    ];
+    const result = applyHint(multiLevel, 'sky', multiState(partialPath));
+    expect(result.status).toBe('revealed');
+  });
+
+  it('slow path: passes the FULL endpoint set (not just two) to solve() for a diverged multi-endpoint color', () => {
+    // Player draws (0,0) -> (0,1), diverging immediately from the stored
+    // solution's second cell (1,0) -- forces the slow re-solve path.
+    const playerPath = [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+    ];
+    const mockedSolvedPath = [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 1, col: 2 },
+      { row: 2, col: 2 },
+      { row: 2, col: 1 },
+      { row: 2, col: 0 },
+    ];
+    solveMock.mockImplementationOnce(() => ({
+      status: 'solved',
+      solution: [mockedSolvedPath],
+      hasSolution: true,
+      nodeCount: 1,
+      searchFullyCompleted: true,
+    }));
+
+    const result = applyHint(multiLevel, 'sky', multiState(playerPath));
+
+    expect(solveMock).toHaveBeenCalledTimes(1);
+    // The call's endpoints argument must carry all 3 of this color's
+    // endpoints, in declared order -- not just "start" and "one other".
+    const [, calledEndpoints] = solveMock.mock.calls[0]!;
+    expect(calledEndpoints).toEqual([multiLevel.colors[0]!.endpoints]);
+
+    expect(result.status).toBe('revealed');
+    if (result.status !== 'revealed') return;
+    expect(result.newPath[0]).toEqual({ row: 0, col: 0 });
+    expect(result.newPath[1]).toEqual({ row: 0, col: 1 });
+  });
+});
+
 // ── GameController integration tests ─────────────────────────────────────────
 
 function makeController(nudgeUndo = vi.fn()) {

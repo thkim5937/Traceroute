@@ -34,12 +34,14 @@ function currentPathFor(level: LevelData, colorId: string, state: GameState): Co
   return stored !== undefined && stored.path.length > 0 ? stored.path : [colorDef.endpoints[0]!];
 }
 
-function targetFor(level: LevelData, colorId: string, path: Coord[]): Coord {
-  const colorDef = level.colors.find((c) => c.colorId === colorId)!;
-  const pathStart = path[0]!;
-  return coordEq(pathStart, colorDef.endpoints[0]!)
-    ? colorDef.endpoints[1]!
-    : colorDef.endpoints[0]!;
+/**
+ * Endpoints of `colorDef` not yet present anywhere in `path` -- order-free,
+ * mirrors ClearDetector.isColorComplete's membership check (TRD §5.15 Phase
+ * 2). A color is fully visited once this is empty, regardless of how many
+ * endpoints it has (2, 3, or 4) or the order they were reached in.
+ */
+function unvisitedEndpoints(colorDef: { endpoints: Coord[] }, path: Coord[]): Coord[] {
+  return colorDef.endpoints.filter((endpoint) => !path.some((cell) => coordEq(cell, endpoint)));
 }
 
 /**
@@ -92,7 +94,8 @@ function revealFromFullPath(fullPath: Coord[], currentPath: Coord[]): HintResult
  *
  * Returns:
  * - `{ status: 'revealed', newPath }` — extends by one straight segment.
- * - `{ status: 'noop' }` — color already reaches its target.
+ * - `{ status: 'noop' }` — color has already visited all of its endpoints
+ *   (2-4, any order — TRD §5.15 Phase 2).
  * - `{ status: 'stuck' }` — board is not provably still completable (or the
  *   solver's interactive budget ran out without finding a candidate);
  *   caller should nudge the player toward Undo. Path is NOT modified.
@@ -102,8 +105,7 @@ export function applyHint(level: LevelData, colorId: string, state: GameState): 
   if (colorDef === undefined) return { status: 'noop' };
 
   const currentPath = currentPathFor(level, colorId, state);
-  const target = targetFor(level, colorId, currentPath);
-  if (coordEq(currentPath[currentPath.length - 1]!, target)) return { status: 'noop' };
+  if (unvisitedEndpoints(colorDef, currentPath).length === 0) return { status: 'noop' };
 
   if (boardMatchesStoredSolution(level, state)) {
     const solutionPath = level.solution.find((s) => s.colorId === colorId)?.path;
@@ -117,13 +119,15 @@ export function applyHint(level: LevelData, colorId: string, state: GameState): 
     .flatMap((c) => state.paths.get(c.colorId)!.path);
   const blockedCells = [...(level.obstacles?.blockedCells ?? []), ...completedPathCells];
 
-  const endpoints: [Coord, Coord][] = [];
+  // TRD §5.15 Phase 2: pass every one of this color's endpoints (2-4), not
+  // just "the other one" -- solve() already tracks per-color remaining-
+  // endpoint sets internally (see Solver.ts) and just needs the full set.
+  const endpoints: Coord[][] = [];
   const initialPaths: (Coord[] | undefined)[] = [];
   let hintedIndex = -1;
   for (const c of notCompleted) {
     const path = currentPathFor(level, c.colorId, state);
-    const colorTarget = targetFor(level, c.colorId, path);
-    endpoints.push([path[0]!, colorTarget]);
+    endpoints.push(c.endpoints);
     initialPaths.push(path);
     if (c.colorId === colorId) hintedIndex = endpoints.length - 1;
   }
