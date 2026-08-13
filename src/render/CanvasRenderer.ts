@@ -96,6 +96,7 @@ export function renderDots(
   palette: Record<string, string>,
 ): void {
   const radius = cellSize * 0.35;
+  const haloRadius = cellSize * 0.46;
 
   for (const { colorId, endpoints } of colors) {
     const color = palette[colorId];
@@ -103,10 +104,18 @@ export function renderDots(
       throw new Error(`No palette color found for colorId "${colorId}"`);
     }
 
-    ctx.fillStyle = color;
     for (const { row, col } of endpoints) {
       const x = col * cellSize + cellSize / 2;
       const y = row * cellSize + cellSize / 2;
+
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, haloRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();

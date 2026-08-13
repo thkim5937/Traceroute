@@ -8,6 +8,7 @@
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
   --accent-shadow: #7d1fcc;
+  --board-frame: #241a3d;
   --neutral-action: #3d7fd6;
   --neutral-action-shadow: #2a5a9c;
   --danger: #e0554a;
@@ -47,6 +48,7 @@
     --accent-bg: rgba(192, 132, 252, 0.15);
     --accent-border: rgba(192, 132, 252, 0.5);
     --accent-shadow: #9455d1;
+    --board-frame: #2d2350;
     --neutral-action: #5a94dd;
     --neutral-action-shadow: #3a6cae;
     --danger: #f2695d;
@@ -272,6 +274,10 @@ code {
   position: relative;
   display: block;
   max-width: 100%;
+  background: var(--board-frame);
+  padding: 16px;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
 #game-canvas {
