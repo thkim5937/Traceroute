@@ -9,12 +9,12 @@
       "colorId": "orange",
       "endpoints": [
         {
-          "row": 0,
-          "col": 0
+          "row": 1,
+          "col": 1
         },
         {
-          "row": 3,
-          "col": 3
+          "row": 5,
+          "col": 4
         }
       ]
     },
@@ -23,11 +23,11 @@
       "endpoints": [
         {
           "row": 4,
-          "col": 1
+          "col": 0
         },
         {
-          "row": 3,
-          "col": 0
+          "row": 5,
+          "col": 2
         }
       ]
     },
@@ -35,11 +35,11 @@
       "colorId": "green",
       "endpoints": [
         {
-          "row": 5,
+          "row": 0,
           "col": 1
         },
         {
-          "row": 4,
+          "row": 3,
           "col": 0
         }
       ]
@@ -48,12 +48,12 @@
       "colorId": "yellow",
       "endpoints": [
         {
-          "row": 0,
-          "col": 5
+          "row": 1,
+          "col": 4
         },
         {
-          "row": 2,
-          "col": 4
+          "row": 0,
+          "col": 3
         }
       ]
     },
@@ -61,12 +61,12 @@
       "colorId": "vermillion",
       "endpoints": [
         {
-          "row": 3,
-          "col": 4
+          "row": 1,
+          "col": 5
         },
         {
           "row": 4,
-          "col": 5
+          "col": 4
         }
       ]
     },
@@ -74,50 +74,54 @@
       "colorId": "sky",
       "endpoints": [
         {
-          "row": 4,
+          "row": 1,
           "col": 3
         },
         {
-          "row": 5,
-          "col": 5
+          "row": 0,
+          "col": 2
         }
       ]
     }
   ],
   "origin": "generated",
   "difficultyTag": "medium",
-  "difficultyScore": 39,
+  "difficultyScore": 41,
   "solution": [
     {
       "colorId": "orange",
       "path": [
         {
-          "row": 0,
-          "col": 0
-        },
-        {
-          "row": 0,
+          "row": 1,
           "col": 1
         },
         {
-          "row": 0,
-          "col": 2
-        },
-        {
-          "row": 1,
-          "col": 2
+          "row": 2,
+          "col": 1
         },
         {
           "row": 2,
           "col": 2
-        },
-        {
-          "row": 2,
-          "col": 3
         },
         {
           "row": 3,
+          "col": 2
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
           "col": 3
+        },
+        {
+          "row": 5,
+          "col": 3
+        },
+        {
+          "row": 5,
+          "col": 4
         }
       ]
     },
@@ -126,15 +130,19 @@
       "path": [
         {
           "row": 4,
-          "col": 1
-        },
-        {
-          "row": 3,
-          "col": 1
-        },
-        {
-          "row": 3,
           "col": 0
+        },
+        {
+          "row": 5,
+          "col": 0
+        },
+        {
+          "row": 5,
+          "col": 1
+        },
+        {
+          "row": 5,
+          "col": 2
         }
       ]
     },
@@ -142,15 +150,23 @@
       "colorId": "green",
       "path": [
         {
-          "row": 5,
+          "row": 0,
           "col": 1
         },
         {
-          "row": 5,
+          "row": 0,
           "col": 0
         },
         {
-          "row": 4,
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 2,
+          "col": 0
+        },
+        {
+          "row": 3,
           "col": 0
         }
       ]
@@ -159,9 +175,22 @@
       "colorId": "yellow",
       "path": [
         {
-          "row": 0,
-          "col": 5
+          "row": 1,
+          "col": 4
         },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "colorId": "vermillion",
+      "path": [
         {
           "row": 1,
           "col": 5
@@ -171,25 +200,16 @@
           "col": 5
         },
         {
-          "row": 2,
-          "col": 4
-        }
-      ]
-    },
-    {
-      "colorId": "vermillion",
-      "path": [
-        {
           "row": 3,
-          "col": 4
-        },
-        {
-          "row": 4,
-          "col": 4
+          "col": 5
         },
         {
           "row": 4,
           "col": 5
+        },
+        {
+          "row": 4,
+          "col": 4
         }
       ]
     },
@@ -197,58 +217,54 @@
       "colorId": "sky",
       "path": [
         {
-          "row": 4,
+          "row": 1,
           "col": 3
         },
         {
-          "row": 5,
-          "col": 3
+          "row": 1,
+          "col": 2
         },
         {
-          "row": 5,
-          "col": 4
-        },
-        {
-          "row": 5,
-          "col": 5
+          "row": 0,
+          "col": 2
         }
       ]
     }
   ],
-  "minTotalEdgeLength": 18,
+  "minTotalEdgeLength": 22,
   "obstacles": {
     "blockedCells": [
       {
-        "row": 1,
-        "col": 0
-      },
-      {
-        "row": 1,
-        "col": 1
+        "row": 2,
+        "col": 3
       },
       {
         "row": 2,
-        "col": 0
+        "col": 4
       },
       {
-        "row": 2,
+        "row": 3,
+        "col": 3
+      },
+      {
+        "row": 3,
+        "col": 4
+      },
+      {
+        "row": 3,
         "col": 1
       },
       {
         "row": 4,
-        "col": 2
+        "col": 1
       },
       {
-        "row": 3,
+        "row": 0,
         "col": 5
       },
       {
-        "row": 3,
-        "col": 2
-      },
-      {
         "row": 5,
-        "col": 2
+        "col": 5
       }
     ],
     "blockedEdges": []

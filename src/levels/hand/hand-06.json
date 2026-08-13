@@ -85,8 +85,8 @@
     }
   ],
   "origin": "hand",
-  "difficultyTag": "medium",
-  "difficultyScore": 38,
+  "difficultyTag": "easy",
+  "difficultyScore": 30,
   "solution": [
     {
       "colorId": "sky",

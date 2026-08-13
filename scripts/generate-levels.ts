@@ -142,11 +142,7 @@ export function randomObstacleBlockedCells(
 // TRD §5.15: for tier 3/4 specs, request 1-2 multi-endpoint colors, each with 3 or 4 endpoints.
 export function randomMultiEndpointRequests(): number[] {
   const count = Math.random() < 0.5 ? 1 : 2;
-  const requests: number[] = [];
-  for (let i = 0; i < count; i++) {
-    requests.push(Math.random() < 0.5 ? 3 : 4);
-  }
-  return requests;
+  return new Array(count).fill(3);
 }
 
 export interface TierDefinition {

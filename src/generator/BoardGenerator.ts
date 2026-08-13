@@ -375,12 +375,25 @@ export function generateBoard(
 
     const endpoints = defaultEndpoints(fillResult.colorPaths);
     const chosenCount = Math.min(multiEndpointRequests.length, colorCount);
-    const chosenIndices = shuffledIndices(colorCount).slice(0, chosenCount);
+    // Prioritize the longest-grown paths for the upgrade instead of picking
+    // uniformly at random: a longer path is far more likely to satisfy
+    // selectMultiEndpoints' MIN_ENDPOINT_GAP spacing requirement, which
+    // meaningfully raises the whole-grid-reroll success rate on dense grids
+    // (TRD §5.15 batch-generation tuning, 2026-08-13). Ties (e.g. mocked
+    // equal-length paths in tests) are broken by a pre-shuffle so ordering
+    // stays non-deterministic when lengths are equal.
+    const colorPaths = fillResult.colorPaths;
+    const chosenIndices = shuffledIndices(colorCount)
+      .sort((a, b) => (colorPaths[b]?.length ?? 0) - (colorPaths[a]?.length ?? 0))
+      .slice(0, chosenCount);
+    // Pair the largest requested endpoint count with the longest available
+    // path for the same reason.
+    const sortedRequests = [...multiEndpointRequests].sort((a, b) => b - a);
 
     let allChosenSucceeded = true;
     for (let i = 0; i < chosenIndices.length; i++) {
       const colorIndex = chosenIndices[i];
-      const requestedCount = multiEndpointRequests[i];
+      const requestedCount = sortedRequests[i];
       if (colorIndex === undefined || requestedCount === undefined) {
         continue;
       }

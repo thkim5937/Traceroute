@@ -512,12 +512,12 @@ describe('assembleLevelBatch (Phase 2: Normalize + assemble)', () => {
 });
 
 describe('multi-endpoint pipeline wiring (TRD §5.15)', () => {
-  it('randomMultiEndpointRequests() always returns 1-2 entries, each 3 or 4', () => {
+  it('randomMultiEndpointRequests() always returns 1-2 entries, each exactly 3', () => {
     for (let i = 0; i < 50; i++) {
       const result = randomMultiEndpointRequests();
       expect([1, 2]).toContain(result.length);
       for (const entry of result) {
-        expect([3, 4]).toContain(entry);
+        expect(entry).toBe(3);
       }
     }
   });

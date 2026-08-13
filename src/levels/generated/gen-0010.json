@@ -9,12 +9,12 @@
       "colorId": "orange",
       "endpoints": [
         {
-          "row": 4,
+          "row": 2,
           "col": 2
         },
         {
           "row": 3,
-          "col": 4
+          "col": 3
         }
       ]
     },
@@ -23,11 +23,11 @@
       "endpoints": [
         {
           "row": 2,
-          "col": 4
+          "col": 0
         },
         {
-          "row": 0,
-          "col": 0
+          "row": 2,
+          "col": 4
         }
       ]
     },
@@ -35,21 +35,8 @@
       "colorId": "green",
       "endpoints": [
         {
-          "row": 1,
-          "col": 3
-        },
-        {
-          "row": 0,
-          "col": 2
-        }
-      ]
-    },
-    {
-      "colorId": "yellow",
-      "endpoints": [
-        {
           "row": 4,
-          "col": 1
+          "col": 2
         },
         {
           "row": 3,
@@ -58,41 +45,50 @@
       ]
     },
     {
+      "colorId": "yellow",
+      "endpoints": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
       "colorId": "vermillion",
       "endpoints": [
         {
-          "row": 0,
-          "col": 1
+          "row": 1,
+          "col": 4
         },
         {
-          "row": 2,
-          "col": 2
+          "row": 0,
+          "col": 0
         }
       ]
     }
   ],
   "origin": "generated",
-  "difficultyTag": "medium",
-  "difficultyScore": 49,
+  "difficultyTag": "easy",
+  "difficultyScore": 30,
   "solution": [
     {
       "colorId": "orange",
       "path": [
         {
-          "row": 4,
+          "row": 2,
           "col": 2
         },
         {
-          "row": 4,
-          "col": 3
-        },
-        {
-          "row": 4,
-          "col": 4
+          "row": 3,
+          "col": 2
         },
         {
           "row": 3,
-          "col": 4
+          "col": 3
         }
       ]
     },
@@ -101,30 +97,6 @@
       "path": [
         {
           "row": 2,
-          "col": 4
-        },
-        {
-          "row": 2,
-          "col": 3
-        },
-        {
-          "row": 3,
-          "col": 3
-        },
-        {
-          "row": 3,
-          "col": 2
-        },
-        {
-          "row": 3,
-          "col": 1
-        },
-        {
-          "row": 2,
-          "col": 1
-        },
-        {
-          "row": 2,
           "col": 0
         },
         {
@@ -132,8 +104,24 @@
           "col": 0
         },
         {
-          "row": 0,
-          "col": 0
+          "row": 1,
+          "col": 1
+        },
+        {
+          "row": 1,
+          "col": 2
+        },
+        {
+          "row": 1,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
+          "row": 2,
+          "col": 4
         }
       ]
     },
@@ -141,29 +129,16 @@
       "colorId": "green",
       "path": [
         {
-          "row": 1,
-          "col": 3
-        },
-        {
-          "row": 0,
-          "col": 3
-        },
-        {
-          "row": 0,
+          "row": 4,
           "col": 2
-        }
-      ]
-    },
-    {
-      "colorId": "yellow",
-      "path": [
+        },
         {
           "row": 4,
           "col": 1
         },
         {
-          "row": 4,
-          "col": 0
+          "row": 3,
+          "col": 1
         },
         {
           "row": 3,
@@ -172,23 +147,48 @@
       ]
     },
     {
+      "colorId": "yellow",
+      "path": [
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 4,
+          "col": 3
+        }
+      ]
+    },
+    {
       "colorId": "vermillion",
       "path": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 3
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
         {
           "row": 0,
           "col": 1
         },
         {
-          "row": 1,
-          "col": 1
-        },
-        {
-          "row": 1,
-          "col": 2
-        },
-        {
-          "row": 2,
-          "col": 2
+          "row": 0,
+          "col": 0
         }
       ]
     }
