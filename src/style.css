@@ -7,6 +7,13 @@
   --accent: #aa3bff;
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
+  --accent-shadow: #7d1fcc;
+  --neutral-action: #3d7fd6;
+  --neutral-action-shadow: #2a5a9c;
+  --danger: #e0554a;
+  --danger-shadow: #a83a31;
+  --warning: #f0b429;
+  --warning-shadow: #b98814;
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
@@ -39,6 +46,13 @@
     --accent: #c084fc;
     --accent-bg: rgba(192, 132, 252, 0.15);
     --accent-border: rgba(192, 132, 252, 0.5);
+    --accent-shadow: #9455d1;
+    --neutral-action: #5a94dd;
+    --neutral-action-shadow: #3a6cae;
+    --danger: #f2695d;
+    --danger-shadow: #b8493d;
+    --warning: #f5c452;
+    --warning-shadow: #c99a24;
     --social-bg: rgba(47, 48, 58, 0.5);
     --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
@@ -332,9 +346,71 @@ code {
   color: #fff;
 }
 
+.control-bar__button,
+.list-button,
+.level-list-overlay__item,
+.clear-overlay__button {
+  --btn-bg: var(--accent);
+  --btn-shadow: var(--accent-shadow);
+  border: none;
+  cursor: pointer;
+  background: var(--btn-bg);
+  box-shadow: 0 4px 0 var(--btn-shadow);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out, filter 0.15s ease-out;
+}
+
+.control-bar__button:hover,
+.list-button:hover,
+.level-list-overlay__item:hover,
+.clear-overlay__button:hover {
+  filter: brightness(1.08);
+}
+
+.control-bar__button:active,
+.list-button:active,
+.level-list-overlay__item:active,
+.clear-overlay__button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--btn-shadow);
+}
+
+.control-bar__undo,
+.control-bar__redo {
+  --btn-bg: var(--neutral-action);
+  --btn-shadow: var(--neutral-action-shadow);
+}
+
+.control-bar__clear {
+  --btn-bg: var(--danger);
+  --btn-shadow: var(--danger-shadow);
+  border-radius: 999px;
+}
+
+.control-bar__hint {
+  --btn-bg: var(--warning);
+  --btn-shadow: var(--warning-shadow);
+}
+
+.control-bar__undo,
+.control-bar__redo,
+.control-bar__hint,
+.list-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @keyframes control-bar-undo-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 var(--accent-border); }
-  50% { box-shadow: 0 0 0 8px var(--accent-border); }
+  0%, 100% {
+    box-shadow: 0 4px 0 var(--accent-shadow), 0 0 0 0 var(--accent-border);
+  }
+  50% {
+    box-shadow: 0 4px 0 var(--accent-shadow), 0 0 0 8px var(--accent-border);
+  }
 }
 
 .control-bar__undo--pulse {
