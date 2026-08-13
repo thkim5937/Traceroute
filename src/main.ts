@@ -138,13 +138,20 @@ function loadLevel(id: string): void {
   level = loadLevelById(id);
   canvas.width = level.gridSize.cols * cellSize;
   canvas.height = level.gridSize.rows * cellSize;
-  controller = createGameController(
+  const thisController: GameController = createGameController(
     level,
     render,
-    showLevelClearOverlay,
-    () => hideClearOverlay(overlay),
-    () => pulseUndoButton(controlBar),
+    () => {
+      if (controller === thisController) showLevelClearOverlay();
+    },
+    () => {
+      if (controller === thisController) hideClearOverlay(overlay);
+    },
+    () => {
+      if (controller === thisController) pulseUndoButton(controlBar);
+    },
   );
+  controller = thisController;
   hideClearOverlay(overlay);
   render();
 }
