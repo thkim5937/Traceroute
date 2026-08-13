@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { detectBounceBackTarget } from '../src/render/Animations';
+import { detectBounceBackTarget, detectPathGrowth } from '../src/render/Animations';
 import type { GameState } from '../src/engine/GameState';
 import type { LevelData } from '../src/data/LevelSchema';
 
@@ -133,6 +133,98 @@ describe('detectBounceBackTarget', () => {
     };
 
     const result = detectBounceBackTarget(state, level, { row: 3, col: 0 }); // b's endpoint, unstarted
+
+    expect(result).toBeNull();
+  });
+});
+
+describe('detectPathGrowth', () => {
+  function stateWithPath(colorId: string, path: { row: number; col: number }[]): GameState {
+    return {
+      levelId: level.id,
+      paths: new Map([[colorId, { colorId, path, completed: false }]]),
+      activeColorId: colorId,
+    };
+  }
+
+  it('returns colorId/from/to when a click appends exactly one cell', () => {
+    const prevState = stateWithPath('a', [{ row: 1, col: 1 }]);
+    const newState = stateWithPath('a', [
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ]);
+
+    const result = detectPathGrowth(prevState, level, { row: 1, col: 2 }, newState);
+
+    expect(result).toEqual({
+      colorId: 'a',
+      from: { row: 1, col: 1 },
+      addedCells: [{ row: 1, col: 2 }],
+    });
+  });
+
+  it('returns null for the first click on an untouched color (no prior tail to draw from)', () => {
+    const prevState: GameState = { levelId: level.id, paths: new Map(), activeColorId: null };
+    const newState = stateWithPath('a', [{ row: 1, col: 1 }]);
+
+    const result = detectPathGrowth(prevState, level, { row: 1, col: 1 }, newState);
+
+    expect(result).toBeNull();
+  });
+
+  it('returns null when the path is unchanged (bounce-back / silent no-op click)', () => {
+    const prevState = stateWithPath('a', [
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ]);
+
+    const result = detectPathGrowth(prevState, level, { row: 2, col: 2 }, prevState);
+
+    expect(result).toBeNull();
+  });
+
+  it('returns null when the path shrank (trim)', () => {
+    const prevState = stateWithPath('a', [
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+      { row: 1, col: 3 },
+    ]);
+    const newState = stateWithPath('a', [{ row: 1, col: 1 }]);
+
+    const result = detectPathGrowth(prevState, level, { row: 1, col: 1 }, newState);
+
+    expect(result).toBeNull();
+  });
+
+  it('detects a multi-cell straight-line extension and returns all added cells in order', () => {
+    const prevState = stateWithPath('a', [{ row: 1, col: 1 }]);
+    const newState = stateWithPath('a', [
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+      { row: 1, col: 3 },
+    ]);
+
+    const result = detectPathGrowth(prevState, level, { row: 1, col: 3 }, newState);
+
+    expect(result).toEqual({
+      colorId: 'a',
+      from: { row: 1, col: 1 },
+      addedCells: [
+        { row: 1, col: 2 },
+        { row: 1, col: 3 },
+      ],
+    });
+  });
+
+  it('returns null when the new path diverges from the prior prefix', () => {
+    const prevState = stateWithPath('a', [{ row: 1, col: 1 }]);
+    // Same length+1, but doesn't share prevPath as an exact prefix.
+    const newState = stateWithPath('a', [
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ]);
+
+    const result = detectPathGrowth(prevState, level, { row: 0, col: 2 }, newState);
 
     expect(result).toBeNull();
   });

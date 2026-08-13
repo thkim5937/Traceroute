@@ -6,7 +6,12 @@ import {
   renderBlockedCells,
 } from './render/CanvasRenderer.ts';
 import { attachInputHandler } from './render/InputHandler.ts';
-import { detectBounceBackTarget, playBounceBackAnimation } from './render/Animations.ts';
+import {
+  detectBounceBackTarget,
+  detectPathGrowth,
+  playBounceBackAnimation,
+  playPathGrowthAnimation,
+} from './render/Animations.ts';
 import { PALETTE } from './palette/palette.ts';
 import { loadLevelById, loadLevelIndex } from './data/LevelLoader.ts';
 import { createGameController, type GameController } from './engine/GameController.ts';
@@ -39,7 +44,8 @@ import {
   hideLevelListScreen,
   isLevelListScreenVisible,
 } from './ui/LevelListScreen.ts';
-import type { LevelData } from './data/LevelSchema.ts';
+import type { Coord, LevelData } from './data/LevelSchema.ts';
+import type { GameState } from './engine/GameState.ts';
 
 const cellSize = 60;
 
@@ -56,12 +62,51 @@ let session: SessionState = saveData.clearedLevelIds.reduce(
   createInitialSessionState(),
 );
 
-function render(): void {
+// Set immediately before a click's `controller.handleClickResult()` call
+// when that click was a pure single-cell path extension (see
+// `detectPathGrowth`), so the very next `render()` call -- fired
+// synchronously inside `handleClickResult` -- plays a growth animation
+// instead of snapping the new segment in instantly (Section 9 polish item).
+let pendingGrowth: {
+  colorId: string;
+  from: Coord;
+  addedCells: Coord[];
+  priorState: GameState;
+} | null = null;
+
+function drawBoard(state: GameState): void {
   renderGrid(ctx, level.gridSize, cellSize);
   renderBlockedCells(ctx, level.obstacles?.blockedCells, cellSize);
   renderDots(ctx, level.colors, cellSize, PALETTE);
-  renderPaths(ctx, controller.getState(), level, cellSize, PALETTE);
+  renderPaths(ctx, state, level, cellSize, PALETTE);
+}
+
+function syncControlBar(): void {
   setControlBarState(controlBar, { canUndo: controller.canUndo(), canRedo: controller.canRedo() });
+}
+
+function render(): void {
+  if (pendingGrowth !== null) {
+    const growth = pendingGrowth;
+    pendingGrowth = null;
+    playPathGrowthAnimation(
+      ctx,
+      growth.priorState,
+      level,
+      cellSize,
+      PALETTE,
+      growth.colorId,
+      growth.from,
+      growth.addedCells,
+      () => {
+        drawBoard(controller.getState());
+        syncControlBar();
+      },
+    );
+    return;
+  }
+  drawBoard(controller.getState());
+  syncControlBar();
 }
 
 function showLevelClearOverlay(): void {
@@ -164,6 +209,12 @@ attachInputHandler(
   () => level,
   () => controller.getState(),
   (clickCell, prevState, newState) => {
+    const growth = detectPathGrowth(prevState, level, clickCell, newState);
+    if (growth !== null) {
+      pendingGrowth = { ...growth, priorState: prevState };
+      controller.handleClickResult(prevState, newState);
+      return;
+    }
     controller.handleClickResult(prevState, newState, () => {
       const bounceTarget = detectBounceBackTarget(prevState, level, clickCell);
       if (bounceTarget !== null) {
