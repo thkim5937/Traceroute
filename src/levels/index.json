@@ -6,127 +6,127 @@
   },
   {
     "id": "gen-0002",
-    "difficultyScore": 26,
+    "difficultyScore": 30,
     "origin": "generated"
   },
   {
     "id": "gen-0003",
-    "difficultyScore": 25,
+    "difficultyScore": 30,
     "origin": "generated"
   },
   {
     "id": "gen-0004",
-    "difficultyScore": 23,
+    "difficultyScore": 34,
     "origin": "generated"
   },
   {
     "id": "gen-0005",
-    "difficultyScore": 25,
+    "difficultyScore": 23,
     "origin": "generated"
   },
   {
     "id": "gen-0006",
-    "difficultyScore": 29,
+    "difficultyScore": 30,
     "origin": "generated"
   },
   {
     "id": "gen-0007",
-    "difficultyScore": 26,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0008",
-    "difficultyScore": 26,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0009",
-    "difficultyScore": 22,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0010",
-    "difficultyScore": 30,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0011",
-    "difficultyScore": 30,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0012",
-    "difficultyScore": 30,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0013",
-    "difficultyScore": 33,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0014",
     "difficultyScore": 37,
     "origin": "generated"
   },
   {
-    "id": "gen-0015",
-    "difficultyScore": 32,
+    "id": "gen-0008",
+    "difficultyScore": 27,
     "origin": "generated"
   },
   {
-    "id": "gen-0016",
-    "difficultyScore": 34,
+    "id": "gen-0009",
+    "difficultyScore": 26,
     "origin": "generated"
   },
   {
-    "id": "gen-0017",
-    "difficultyScore": 29,
+    "id": "gen-0010",
+    "difficultyScore": 26,
     "origin": "generated"
   },
   {
-    "id": "gen-0018",
-    "difficultyScore": 34,
+    "id": "gen-0011",
+    "difficultyScore": 25,
     "origin": "generated"
   },
   {
-    "id": "gen-0019",
-    "difficultyScore": 38,
+    "id": "gen-0012",
+    "difficultyScore": 35,
     "origin": "generated"
   },
   {
-    "id": "gen-0020",
-    "difficultyScore": 41,
+    "id": "gen-0013",
+    "difficultyScore": 39,
     "origin": "generated"
   },
   {
-    "id": "gen-0021",
-    "difficultyScore": 34,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0022",
+    "id": "gen-0014",
     "difficultyScore": 30,
     "origin": "generated"
   },
   {
-    "id": "gen-0023",
+    "id": "gen-0015",
+    "difficultyScore": 37,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0016",
+    "difficultyScore": 33,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0017",
+    "difficultyScore": 35,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0018",
+    "difficultyScore": 33,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0019",
+    "difficultyScore": 31,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0020",
+    "difficultyScore": 33,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0021",
+    "difficultyScore": 31,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0022",
     "difficultyScore": 45,
     "origin": "generated"
   },
   {
+    "id": "gen-0023",
+    "difficultyScore": 43,
+    "origin": "generated"
+  },
+  {
     "id": "gen-0024",
-    "difficultyScore": 52,
+    "difficultyScore": 45,
     "origin": "generated"
   },
   {
     "id": "gen-0025",
-    "difficultyScore": 44,
+    "difficultyScore": 73,
     "origin": "generated"
   },
   {
     "id": "gen-0026",
-    "difficultyScore": 44,
+    "difficultyScore": 49,
     "origin": "generated"
   },
   {
@@ -136,22 +136,22 @@
   },
   {
     "id": "gen-0028",
-    "difficultyScore": 65,
+    "difficultyScore": 50,
     "origin": "generated"
   },
   {
     "id": "gen-0029",
-    "difficultyScore": 45,
+    "difficultyScore": 57,
     "origin": "generated"
   },
   {
     "id": "gen-0030",
-    "difficultyScore": 52,
+    "difficultyScore": 56,
     "origin": "generated"
   },
   {
     "id": "gen-0031",
-    "difficultyScore": 43,
+    "difficultyScore": 55,
     "origin": "generated"
   },
   {
@@ -161,42 +161,42 @@
   },
   {
     "id": "gen-0033",
-    "difficultyScore": 50,
+    "difficultyScore": 53,
     "origin": "generated"
   },
   {
     "id": "gen-0034",
-    "difficultyScore": 72,
+    "difficultyScore": 69,
     "origin": "generated"
   },
   {
-    "id": "gen-0037",
-    "difficultyScore": 63,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0040",
-    "difficultyScore": 61,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0041",
+    "id": "gen-0036",
     "difficultyScore": 100,
     "origin": "generated"
   },
   {
+    "id": "gen-0037",
+    "difficultyScore": 78,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0038",
+    "difficultyScore": 72,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0040",
+    "difficultyScore": 64,
+    "origin": "generated"
+  },
+  {
+    "id": "gen-0041",
+    "difficultyScore": 72,
+    "origin": "generated"
+  },
+  {
     "id": "gen-0042",
-    "difficultyScore": 99,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0043",
-    "difficultyScore": 82,
-    "origin": "generated"
-  },
-  {
-    "id": "gen-0044",
-    "difficultyScore": 66,
+    "difficultyScore": 76,
     "origin": "generated"
   },
   {
@@ -216,12 +216,12 @@
   },
   {
     "id": "hand-04",
-    "difficultyScore": 23,
+    "difficultyScore": 24,
     "origin": "hand"
   },
   {
     "id": "hand-05",
-    "difficultyScore": 26,
+    "difficultyScore": 27,
     "origin": "hand"
   },
   {

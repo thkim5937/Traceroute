@@ -272,6 +272,7 @@ export function fillGridWithRetry(
 }
 
 export const MIN_ENDPOINT_GAP = 2;
+export const MIN_ENDPOINT_GRID_DISTANCE = 2;
 
 export function selectMultiEndpoints(path: Coord[], endpointCount: number): Coord[] | undefined {
   const lastIndex = path.length - 1;
@@ -288,13 +289,32 @@ export function selectMultiEndpoints(path: Coord[], endpointCount: number): Coor
     }
   }
 
-  return indices.map((index) => {
+  const cells = indices.map((index) => {
     const cell = path[index];
     if (cell === undefined) {
       throw new Error('selectMultiEndpoints: index out of range despite bounds check');
     }
     return cell;
   });
+
+  // Index spacing along the path doesn't guarantee grid spacing -- a randomly
+  // grown snake can curl back near itself, so two endpoints picked far apart
+  // along the path can still land physically close together on the grid.
+  // Enforce the same MIN_ENDPOINT_GAP policy in actual grid (Manhattan)
+  // distance too, checking every pair (not just consecutive ones).
+  for (let i = 0; i < cells.length; i++) {
+    for (let j = i + 1; j < cells.length; j++) {
+      const a = cells[i];
+      const b = cells[j];
+      if (a === undefined || b === undefined) continue;
+      const manhattan = Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
+      if (manhattan < MIN_ENDPOINT_GRID_DISTANCE) {
+        return undefined;
+      }
+    }
+  }
+
+  return cells;
 }
 
 function shuffledIndices(count: number): number[] {

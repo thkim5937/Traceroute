@@ -9,11 +9,11 @@
       "colorId": "orange",
       "endpoints": [
         {
-          "row": 3,
-          "col": 3
+          "row": 2,
+          "col": 4
         },
         {
-          "row": 4,
+          "row": 3,
           "col": 2
         }
       ]
@@ -22,12 +22,12 @@
       "colorId": "blue",
       "endpoints": [
         {
-          "row": 0,
-          "col": 4
+          "row": 2,
+          "col": 2
         },
         {
-          "row": 1,
-          "col": 2
+          "row": 3,
+          "col": 4
         }
       ]
     },
@@ -39,8 +39,8 @@
           "col": 1
         },
         {
-          "row": 0,
-          "col": 3
+          "row": 2,
+          "col": 0
         }
       ]
     },
@@ -48,12 +48,12 @@
       "colorId": "yellow",
       "endpoints": [
         {
-          "row": 3,
-          "col": 0
+          "row": 1,
+          "col": 2
         },
         {
-          "row": 4,
-          "col": 4
+          "row": 0,
+          "col": 3
         }
       ]
     },
@@ -61,33 +61,37 @@
       "colorId": "vermillion",
       "endpoints": [
         {
-          "row": 2,
-          "col": 1
+          "row": 0,
+          "col": 4
         },
         {
-          "row": 0,
-          "col": 0
+          "row": 1,
+          "col": 3
         }
       ]
     }
   ],
   "origin": "generated",
   "difficultyTag": "easy",
-  "difficultyScore": 26,
+  "difficultyScore": 30,
   "solution": [
     {
       "colorId": "orange",
       "path": [
         {
+          "row": 2,
+          "col": 4
+        },
+        {
+          "row": 2,
+          "col": 3
+        },
+        {
           "row": 3,
           "col": 3
         },
         {
-          "row": 4,
-          "col": 3
-        },
-        {
-          "row": 4,
+          "row": 3,
           "col": 2
         }
       ]
@@ -96,20 +100,36 @@
       "colorId": "blue",
       "path": [
         {
-          "row": 0,
-          "col": 4
+          "row": 2,
+          "col": 2
         },
         {
-          "row": 1,
-          "col": 4
+          "row": 2,
+          "col": 1
         },
         {
-          "row": 1,
+          "row": 3,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 1
+        },
+        {
+          "row": 4,
+          "col": 2
+        },
+        {
+          "row": 4,
           "col": 3
         },
         {
-          "row": 1,
-          "col": 2
+          "row": 4,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 4
         }
       ]
     },
@@ -121,16 +141,12 @@
           "col": 1
         },
         {
-          "row": 0,
-          "col": 1
+          "row": 1,
+          "col": 0
         },
         {
-          "row": 0,
-          "col": 2
-        },
-        {
-          "row": 0,
-          "col": 3
+          "row": 2,
+          "col": 0
         }
       ]
     },
@@ -138,36 +154,16 @@
       "colorId": "yellow",
       "path": [
         {
-          "row": 3,
-          "col": 0
-        },
-        {
-          "row": 3,
-          "col": 1
-        },
-        {
-          "row": 3,
+          "row": 1,
           "col": 2
         },
         {
-          "row": 2,
+          "row": 0,
           "col": 2
         },
         {
-          "row": 2,
+          "row": 0,
           "col": 3
-        },
-        {
-          "row": 2,
-          "col": 4
-        },
-        {
-          "row": 3,
-          "col": 4
-        },
-        {
-          "row": 4,
-          "col": 4
         }
       ]
     },
@@ -175,23 +171,19 @@
       "colorId": "vermillion",
       "path": [
         {
-          "row": 2,
-          "col": 1
-        },
-        {
-          "row": 2,
-          "col": 0
+          "row": 0,
+          "col": 4
         },
         {
           "row": 1,
-          "col": 0
+          "col": 4
         },
         {
-          "row": 0,
-          "col": 0
+          "row": 1,
+          "col": 3
         }
       ]
     }
   ],
-  "minTotalEdgeLength": 18
+  "minTotalEdgeLength": 16
 }

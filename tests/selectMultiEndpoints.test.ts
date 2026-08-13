@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { MIN_ENDPOINT_GAP, selectMultiEndpoints } from '../src/generator/BoardGenerator.ts';
+import {
+  MIN_ENDPOINT_GAP,
+  MIN_ENDPOINT_GRID_DISTANCE,
+  selectMultiEndpoints,
+} from '../src/generator/BoardGenerator.ts';
 import type { Coord } from '../src/data/LevelSchema.ts';
 
 function straightPath(length: number): Coord[] {
@@ -55,6 +59,50 @@ describe('selectMultiEndpoints', () => {
     const indices = result.map((c) => path.findIndex((p) => p.row === c.row && p.col === c.col));
     for (let i = 1; i < indices.length; i++) {
       expect(indices[i]).toBeGreaterThan(indices[i - 1]!);
+    }
+  });
+
+  it('returns undefined when a curled-back path places index-spaced endpoints orthogonally adjacent', () => {
+    // Spiral-in shape. Path indices 0, 3, 6 are evenly spaced along the path
+    // (satisfying the index-gap check), but index 0 (0,0) and index 3 (0,1)
+    // end up only Manhattan-distance 1 apart on the grid because the path
+    // curls back -- true orthogonal adjacency, which must still be rejected.
+    const path: Coord[] = [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 1, col: 2 },
+      { row: 2, col: 2 },
+    ];
+    const result = selectMultiEndpoints(path, 3);
+    expect(result).toBeUndefined();
+  });
+
+  it('accepts index-spaced endpoints that are only diagonal-adjacent (Manhattan distance 2)', () => {
+    // Same U-shape as before: index 0 (0,0) and index 6 (0,2) are
+    // Manhattan-distance 2 apart (diagonal-adjacent), which the relaxed
+    // MIN_ENDPOINT_GRID_DISTANCE threshold now allows.
+    const path: Coord[] = [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 2, col: 0 },
+      { row: 2, col: 1 },
+      { row: 2, col: 2 },
+      { row: 1, col: 2 },
+      { row: 0, col: 2 },
+    ];
+    const result = selectMultiEndpoints(path, 3);
+    expect(result).toBeDefined();
+    for (let i = 0; i < result!.length; i++) {
+      for (let j = i + 1; j < result!.length; j++) {
+        const a = result![i]!;
+        const b = result![j]!;
+        expect(Math.abs(a.row - b.row) + Math.abs(a.col - b.col)).toBeGreaterThanOrEqual(
+          MIN_ENDPOINT_GRID_DISTANCE,
+        );
+      }
     }
   });
 });

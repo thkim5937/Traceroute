@@ -85,7 +85,7 @@ function syncControlBar(): void {
   setControlBarState(controlBar, { canUndo: controller.canUndo(), canRedo: controller.canRedo() });
 }
 
-function render(): void {
+function render(afterRender?: () => void): void {
   if (pendingGrowth !== null) {
     const growth = pendingGrowth;
     pendingGrowth = null;
@@ -101,12 +101,14 @@ function render(): void {
       () => {
         drawBoard(controller.getState());
         syncControlBar();
+        afterRender?.();
       },
     );
     return;
   }
   drawBoard(controller.getState());
   syncControlBar();
+  afterRender?.();
 }
 
 function showLevelClearOverlay(): void {

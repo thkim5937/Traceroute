@@ -57,11 +57,30 @@ export function handleCellClick(
     const primaryAligned = clickCell.row === primaryTail.row || clickCell.col === primaryTail.col;
     if (primaryAligned) {
       const segment = walkStraightSegment(state, level, colorId, path, primaryTail, clickCell);
-      if (segment.blocked) {
-        return state;
+      if (!segment.blocked) {
+        const updatedPath = [...path, ...segment.cells];
+        return commit(state, colorId, { colorId, path: updatedPath, completed: false });
       }
-      const updatedPath = [...path, ...segment.cells];
-      return commit(state, colorId, { colorId, path: updatedPath, completed: false });
+    }
+
+    // No edge has been drawn yet (just the lone starting dot) -- clicking a
+    // different endpoint of the SAME color here is "changing your mind" about
+    // where to start, not a real move, so restart there instead of no-op'ing.
+    // Scoped strictly to path.length === 1 so it can never affect trim/extend
+    // behavior once an actual line exists.
+    if (path.length === 1) {
+      let color;
+      for (const n of level.colors) {
+        if (n.colorId === colorId) {
+          color = n;
+        }
+      }
+      if (
+        color !== undefined &&
+        color.endpoints.some((e) => e.row === clickCell.row && e.col === clickCell.col)
+      ) {
+        return commit(state, colorId, { colorId, path: [clickCell], completed: false });
+      }
     }
 
     return state;

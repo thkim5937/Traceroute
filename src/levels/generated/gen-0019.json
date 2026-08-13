@@ -9,11 +9,11 @@
       "colorId": "orange",
       "endpoints": [
         {
-          "row": 1,
-          "col": 5
+          "row": 3,
+          "col": 2
         },
         {
-          "row": 0,
+          "row": 1,
           "col": 3
         }
       ]
@@ -22,33 +22,7 @@
       "colorId": "blue",
       "endpoints": [
         {
-          "row": 1,
-          "col": 0
-        },
-        {
-          "row": 2,
-          "col": 1
-        }
-      ]
-    },
-    {
-      "colorId": "green",
-      "endpoints": [
-        {
-          "row": 3,
-          "col": 2
-        },
-        {
-          "row": 2,
-          "col": 3
-        }
-      ]
-    },
-    {
-      "colorId": "yellow",
-      "endpoints": [
-        {
-          "row": 3,
+          "row": 5,
           "col": 1
         },
         {
@@ -58,20 +32,7 @@
       ]
     },
     {
-      "colorId": "vermillion",
-      "endpoints": [
-        {
-          "row": 5,
-          "col": 1
-        },
-        {
-          "row": 4,
-          "col": 0
-        }
-      ]
-    },
-    {
-      "colorId": "sky",
+      "colorId": "green",
       "endpoints": [
         {
           "row": 0,
@@ -79,32 +40,71 @@
         },
         {
           "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "colorId": "yellow",
+      "endpoints": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
+      "colorId": "vermillion",
+      "endpoints": [
+        {
+          "row": 1,
+          "col": 4
+        },
+        {
+          "row": 0,
+          "col": 5
+        }
+      ]
+    },
+    {
+      "colorId": "sky",
+      "endpoints": [
+        {
+          "row": 1,
           "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
         }
       ]
     }
   ],
   "origin": "generated",
-  "difficultyTag": "medium",
-  "difficultyScore": 38,
+  "difficultyTag": "easy",
+  "difficultyScore": 31,
   "solution": [
     {
       "colorId": "orange",
       "path": [
         {
-          "row": 1,
-          "col": 5
+          "row": 3,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 2
+        },
+        {
+          "row": 2,
+          "col": 3
         },
         {
           "row": 1,
-          "col": 4
-        },
-        {
-          "row": 0,
-          "col": 4
-        },
-        {
-          "row": 0,
           "col": 3
         }
       ]
@@ -113,41 +113,7 @@
       "colorId": "blue",
       "path": [
         {
-          "row": 1,
-          "col": 0
-        },
-        {
-          "row": 2,
-          "col": 0
-        },
-        {
-          "row": 2,
-          "col": 1
-        }
-      ]
-    },
-    {
-      "colorId": "green",
-      "path": [
-        {
-          "row": 3,
-          "col": 2
-        },
-        {
-          "row": 2,
-          "col": 2
-        },
-        {
-          "row": 2,
-          "col": 3
-        }
-      ]
-    },
-    {
-      "colorId": "yellow",
-      "path": [
-        {
-          "row": 3,
+          "row": 5,
           "col": 1
         },
         {
@@ -159,16 +125,16 @@
           "col": 2
         },
         {
-          "row": 5,
-          "col": 2
-        },
-        {
-          "row": 5,
+          "row": 4,
           "col": 3
         },
         {
-          "row": 5,
+          "row": 4,
           "col": 4
+        },
+        {
+          "row": 4,
+          "col": 5
         },
         {
           "row": 5,
@@ -177,19 +143,57 @@
       ]
     },
     {
+      "colorId": "green",
+      "path": [
+        {
+          "row": 0,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 0
+        },
+        {
+          "row": 1,
+          "col": 1
+        }
+      ]
+    },
+    {
+      "colorId": "yellow",
+      "path": [
+        {
+          "row": 2,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 5
+        },
+        {
+          "row": 3,
+          "col": 4
+        },
+        {
+          "row": 3,
+          "col": 3
+        }
+      ]
+    },
+    {
       "colorId": "vermillion",
       "path": [
         {
-          "row": 5,
-          "col": 1
+          "row": 1,
+          "col": 4
         },
         {
-          "row": 5,
-          "col": 0
+          "row": 1,
+          "col": 5
         },
         {
-          "row": 4,
-          "col": 0
+          "row": 0,
+          "col": 5
         }
       ]
     },
@@ -197,20 +201,16 @@
       "colorId": "sky",
       "path": [
         {
-          "row": 0,
-          "col": 0
-        },
-        {
-          "row": 0,
-          "col": 1
-        },
-        {
-          "row": 1,
-          "col": 1
-        },
-        {
           "row": 1,
           "col": 2
+        },
+        {
+          "row": 0,
+          "col": 2
+        },
+        {
+          "row": 0,
+          "col": 3
         }
       ]
     }
@@ -219,44 +219,36 @@
   "obstacles": {
     "blockedCells": [
       {
-        "row": 3,
-        "col": 3
+        "row": 2,
+        "col": 0
       },
       {
-        "row": 3,
-        "col": 4
-      },
-      {
-        "row": 3,
-        "col": 5
-      },
-      {
-        "row": 4,
-        "col": 3
-      },
-      {
-        "row": 4,
-        "col": 4
-      },
-      {
-        "row": 4,
-        "col": 5
-      },
-      {
-        "row": 0,
-        "col": 5
-      },
-      {
-        "row": 0,
-        "col": 2
+        "row": 2,
+        "col": 1
       },
       {
         "row": 3,
         "col": 0
       },
       {
-        "row": 1,
-        "col": 3
+        "row": 3,
+        "col": 1
+      },
+      {
+        "row": 0,
+        "col": 4
+      },
+      {
+        "row": 2,
+        "col": 4
+      },
+      {
+        "row": 0,
+        "col": 1
+      },
+      {
+        "row": 5,
+        "col": 4
       }
     ],
     "blockedEdges": []

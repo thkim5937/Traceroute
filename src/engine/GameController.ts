@@ -44,7 +44,7 @@ export interface GameController {
 
 export function createGameController(
   level: LevelData,
-  render: () => void,
+  render: (onSettled?: () => void) => void,
   showOverlay: () => void,
   hideOverlay: () => void,
   nudgeUndo: () => void = () => {},
@@ -79,11 +79,12 @@ export function createGameController(
     past.push(state);
     future = [];
     state = updateCompletionStatus(newState, level);
-    render();
-    if (isBoardClear(state, level)) {
-      clear = true;
-      showOverlay();
-    }
+    render(() => {
+      if (isBoardClear(state, level)) {
+        clear = true;
+        showOverlay();
+      }
+    });
   }
 
   function resetLevel(): void {
@@ -150,11 +151,12 @@ export function createGameController(
     past.push(state);
     future = [];
     state = updateCompletionStatus(nextState, level);
-    render();
-    if (isBoardClear(state, level)) {
-      clear = true;
-      showOverlay();
-    }
+    render(() => {
+      if (isBoardClear(state, level)) {
+        clear = true;
+        showOverlay();
+      }
+    });
   }
 
   return {

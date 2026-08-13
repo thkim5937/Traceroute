@@ -87,7 +87,7 @@ describe('ClearOverlay', () => {
 
 describe('createGameController', () => {
   it('does not show the overlay while the board is not clear', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -105,7 +105,7 @@ describe('createGameController', () => {
   });
 
   it('shows the overlay immediately once the state update completes the board', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -142,7 +142,7 @@ describe('createGameController', () => {
   });
 
   it('ignores further clicks (no state change, no render) once the board is clear', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -182,7 +182,7 @@ describe('createGameController', () => {
   });
 
   it('resets to a fresh, unclear state and hides the overlay on resetLevel', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -238,7 +238,7 @@ describe('createGameController', () => {
   };
 
   it('undo reverts the last committed click and redo re-applies it', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -256,7 +256,7 @@ describe('createGameController', () => {
   });
 
   it('a new committed click after undo clears the redo future', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -276,7 +276,7 @@ describe('createGameController', () => {
   });
 
   it('clearBoard resets to the initial empty state and is itself undoable', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -293,7 +293,7 @@ describe('createGameController', () => {
   });
 
   it('undo un-freezes a color that was completed before the reverted click (§5.1 rule 0)', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const showOverlay = vi.fn();
     const hideOverlay = vi.fn();
     const controller = createGameController(level, render, showOverlay, hideOverlay);
@@ -318,7 +318,7 @@ describe('createGameController', () => {
   });
 
   it('canUndo/canRedo report false with empty history', () => {
-    const render = vi.fn();
+    const render = vi.fn((onSettled?: () => void) => onSettled?.());
     const controller = createGameController(level, render, vi.fn(), vi.fn());
     expect(controller.canUndo()).toBe(false);
     expect(controller.canRedo()).toBe(false);

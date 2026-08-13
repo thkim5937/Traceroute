@@ -90,7 +90,7 @@ describe('handleCellClick', () => {
     expect(colorState?.path).toEqual([{ row: 0, col: 0 }]);
     expect(state.activeColorId).toBe('test');
   });
-  it("blocks extension into another color's endpoint dot, with no partial change", () => {
+  it('restarts at the other endpoint when a blocked extension targets it, since only the lone starting dot is placed', () => {
     const level: LevelData = {
       id: 'test-level-block-dot',
       gridSize: { rows: 3, cols: 3 },
@@ -126,12 +126,15 @@ describe('handleCellClick', () => {
     state = handleCellClick(state, level, 'a', { row: 0, col: 0 });
     state = handleCellClick(state, level, 'a', { row: 0, col: 2 });
 
+    // The straight extension is blocked by b's endpoint dot at (0,1), but
+    // (0,2) is one of a's own endpoints and no edge has been drawn yet, so
+    // this restarts the path there instead of no-op'ing (Fix 3).
     const colorStateA = state.paths.get('a');
-    expect(colorStateA?.path).toEqual([{ row: 0, col: 0 }]);
+    expect(colorStateA?.path).toEqual([{ row: 0, col: 2 }]);
     expect(state.activeColorId).toBe('a');
   });
 
-  it("blocks extension into another color's already-drawn path, with no partial change", () => {
+  it("restarts at the other endpoint when another color's already-drawn path blocks the extension", () => {
     const level: LevelData = {
       id: 'test-level-block-path',
       gridSize: { rows: 3, cols: 3 },
@@ -170,8 +173,10 @@ describe('handleCellClick', () => {
     state = handleCellClick(state, level, 'a', { row: 0, col: 0 });
     state = handleCellClick(state, level, 'a', { row: 0, col: 2 });
 
+    // Blocked by b's drawn path at (0,1), but (0,2) is a's own endpoint and
+    // no edge has been drawn yet, so this restarts there instead (Fix 3).
     const colorStateA = state.paths.get('a');
-    expect(colorStateA?.path).toEqual([{ row: 0, col: 0 }]);
+    expect(colorStateA?.path).toEqual([{ row: 0, col: 2 }]);
     expect(state.activeColorId).toBe('a');
   });
   it('blocks self-intersecting extension, with no partial change', () => {
@@ -646,7 +651,7 @@ describe('handleCellClick', () => {
     expect(state.activeColorId).toBe('a');
   });
 
-  it("blocks extension through another color's already-drawn non-endpoint path cell", () => {
+  it("restarts at the other endpoint when another color's non-endpoint path cell blocks the extension", () => {
     const level: LevelData = {
       id: 'test-level-block-middle-path',
       gridSize: { rows: 4, cols: 4 },
@@ -685,8 +690,10 @@ describe('handleCellClick', () => {
     state = handleCellClick(state, level, 'a', { row: 0, col: 1 });
     state = handleCellClick(state, level, 'a', { row: 3, col: 1 });
 
+    // Blocked by b's non-endpoint path cell at (2,1), but (3,1) is a's own
+    // endpoint and no edge has been drawn yet, so this restarts there (Fix 3).
     const colorStateA = state.paths.get('a');
-    expect(colorStateA?.path).toEqual([{ row: 0, col: 1 }]);
+    expect(colorStateA?.path).toEqual([{ row: 3, col: 1 }]);
     expect(state.activeColorId).toBe('a');
   });
 
@@ -850,7 +857,7 @@ describe('handleCellClick', () => {
 });
 
 describe('obstacles.blockedCells', () => {
-  it("bounces back off a blocked cell exactly like walking through another color's path", () => {
+  it('restarts at the other endpoint when a blocked cell obstructs the extension', () => {
     const level: LevelData = {
       id: 'test-level-blocked-cell',
       gridSize: { rows: 1, cols: 4 },
@@ -880,8 +887,10 @@ describe('obstacles.blockedCells', () => {
     state = handleCellClick(state, level, 'a', { row: 0, col: 0 });
     state = handleCellClick(state, level, 'a', { row: 0, col: 3 });
 
+    // Blocked by the obstacle at (0,2), but (0,3) is a's own endpoint and no
+    // edge has been drawn yet, so this restarts there instead (Fix 3).
     const colorStateA = state.paths.get('a');
-    expect(colorStateA?.path).toEqual([{ row: 0, col: 0 }]);
+    expect(colorStateA?.path).toEqual([{ row: 0, col: 3 }]);
     expect(state.activeColorId).toBe('a');
   });
 
@@ -1017,5 +1026,63 @@ describe('multi-endpoint colors (TRD §5.15)', () => {
     };
 
     expect(resolveColorIdForClick(state, multiEndpointLevel, { row: 2, col: 0 })).toBe('a');
+  });
+
+  const switchStartLevel: LevelData = {
+    id: 'test-level-switch-start',
+    gridSize: { rows: 3, cols: 3 },
+    colors: [
+      {
+        colorId: 'a',
+        endpoints: [
+          { row: 0, col: 0 },
+          { row: 2, col: 1 },
+          { row: 0, col: 2 },
+        ],
+      },
+    ],
+    origin: 'hand',
+    difficultyTag: 'easy',
+    difficultyScore: 0,
+    solution: [],
+    minTotalEdgeLength: 0,
+  };
+
+  it('handleCellClick restarts at a different own endpoint when only the lone starting dot is placed', () => {
+    const state: GameState = {
+      levelId: 'test-level-switch-start',
+      paths: new Map(),
+      activeColorId: null,
+    };
+
+    const afterA = handleCellClick(state, switchStartLevel, 'a', { row: 0, col: 0 });
+    expect(afterA.paths.get('a')?.path).toEqual([{ row: 0, col: 0 }]);
+
+    // (2,1) is neither row- nor col-aligned with (0,0) -- not aligned, so
+    // this would normally no-op.
+    const afterB = handleCellClick(afterA, switchStartLevel, 'a', { row: 2, col: 1 });
+    expect(afterB.paths.get('a')?.path).toEqual([{ row: 2, col: 1 }]);
+  });
+
+  it('handleCellClick does NOT restart at a different own endpoint once a real edge is drawn', () => {
+    const state: GameState = {
+      levelId: 'test-level-switch-start',
+      paths: new Map(),
+      activeColorId: null,
+    };
+
+    const afterA = handleCellClick(state, switchStartLevel, 'a', { row: 0, col: 0 });
+    const afterExtend = handleCellClick(afterA, switchStartLevel, 'a', { row: 0, col: 2 });
+    expect(afterExtend.paths.get('a')?.path).toEqual([
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ]);
+
+    // (2,1) is neither row- nor col-aligned with the tail (0,2) -- not
+    // aligned, and a real edge already exists, so this must bounce (no-op),
+    // not restart the path.
+    const afterAttempt = handleCellClick(afterExtend, switchStartLevel, 'a', { row: 2, col: 1 });
+    expect(afterAttempt).toBe(afterExtend);
   });
 });
