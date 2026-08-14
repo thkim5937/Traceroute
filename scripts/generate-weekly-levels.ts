@@ -17,8 +17,6 @@ import {
   HAND_LEVELS_DIR,
   GENERATED_LEVELS_DIR,
   LEVEL_INDEX_PATH,
-  PIPELINE_SOLVER_NODE_LIMIT,
-  PIPELINE_SOLVER_TIME_LIMIT_MS,
   type TierDefinition,
 } from './generate-levels.ts';
 
@@ -34,9 +32,13 @@ export const AI_REVIEW_RETRY_LIMIT = 3;
 // week" so the workflow can skip opening a PR instead of treating it as a failure.
 export const NOTHING_TO_SUBMIT_EXIT_CODE = 2;
 
+export const WEEKLY_SOLVER_TIME_LIMIT_MS = 10_000;
+export const WEEKLY_SOLVER_NODE_LIMIT = 2_000_000;
+export const WEEKLY_CANDIDATE_TIME_BUDGET_MS = 60_000;
+
 const WEEKLY_SOLVER_LIMITS: SolverLimits = {
-  nodeLimit: PIPELINE_SOLVER_NODE_LIMIT,
-  timeLimitMs: PIPELINE_SOLVER_TIME_LIMIT_MS,
+  nodeLimit: WEEKLY_SOLVER_NODE_LIMIT,
+  timeLimitMs: WEEKLY_SOLVER_TIME_LIMIT_MS,
 };
 
 export function pickTierForSlot(slotIndex: number): TierDefinition {
@@ -126,6 +128,9 @@ export function generateCandidateLevel(
     undefined,
     undefined,
     WEEKLY_SOLVER_LIMITS,
+    undefined,
+    undefined,
+    Date.now() + WEEKLY_CANDIDATE_TIME_BUDGET_MS,
   );
   if (
     result.status === 'failed' ||

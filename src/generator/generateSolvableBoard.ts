@@ -24,10 +24,15 @@ export function generateSolvableBoard(
   limits?: SolverLimits,
   minRawScoreThreshold?: number,
   multiEndpointRequests?: number[],
+  overallDeadlineMs?: number,
 ): SolvableBoardResult {
   let totalUsed = 0;
 
   for (;;) {
+    if (overallDeadlineMs !== undefined && Date.now() > overallDeadlineMs) {
+      return { status: 'failed', totalAttemptsUsed: totalUsed };
+    }
+
     const remaining = GENERATOR_RETRY_LIMIT - totalUsed;
     if (remaining <= 0) {
       return { status: 'failed', totalAttemptsUsed: totalUsed };

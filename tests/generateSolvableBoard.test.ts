@@ -361,4 +361,25 @@ describe('generateSolvableBoard', () => {
     expect(generateBoardMock).toHaveBeenCalledTimes(1);
     expect(solveMock).toHaveBeenCalledTimes(1);
   });
+
+  it('stops quickly once overallDeadlineMs has already passed, instead of retrying up to GENERATOR_RETRY_LIMIT', () => {
+    const generateBoardMock = vi.fn(() => board({ attemptsUsed: 1 }));
+    const solveMock = vi.fn(() => solverResult({ status: 'unresolved' }));
+
+    const result = generateSolvableBoard(
+      gridSize,
+      colorCount,
+      undefined,
+      { generateBoard: generateBoardMock, solve: solveMock },
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      Date.now() - 1,
+    );
+
+    expect(result.status).toBe('failed');
+    expect(generateBoardMock.mock.calls.length).toBeLessThan(5);
+    expect(solveMock.mock.calls.length).toBeLessThan(5);
+  });
 });
