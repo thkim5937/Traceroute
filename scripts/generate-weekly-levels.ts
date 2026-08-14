@@ -88,7 +88,8 @@ export function buildReviewPrompt(
     '2. The candidate is subjectively fun and satisfying to solve.',
     '3. The difficultyTag actually match how the level would feel to play, not just the numeric score.',
     '4. difficultyTag is "medium" or "hard" -- reject anything that comes out "easy".',
-    'Respond with ONLY compact JSON matching this exact shape: {"approved": boolean, "reasoning": string}.',
+    'Respond with ONLY compact JSON matching this exact shape: {"approved": boolean, "reasoning": string}. ' +
+      'Keep "reasoning" to at most 2 sentences (roughly 40 words).',
   ].join('\n');
 }
 
@@ -294,6 +295,19 @@ function writeApprovedLevels(approvedLevels: LevelData[], existingIndex: LevelIn
   writeFileSync(LEVEL_INDEX_PATH, JSON.stringify(newIndex, null, 2) + '\n');
 }
 
+export function parseReviewResponse(text: string): ReviewApiResult {
+  try {
+    const parsed = JSON.parse(text) as Partial<ReviewApiResult>;
+    return { approved: Boolean(parsed.approved), reasoning: String(parsed.reasoning ?? '') };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      approved: false,
+      reasoning: `AI review response was not valid JSON (${message}); treating as rejected. Raw response (truncated): ${text.slice(0, 200)}`,
+    };
+  }
+}
+
 async function createAnthropicReviewApi(): Promise<(prompt: string) => Promise<ReviewApiResult>> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -305,12 +319,11 @@ async function createAnthropicReviewApi(): Promise<(prompt: string) => Promise<R
   return async (prompt: string) => {
     const message = await client.messages.create({
       model: 'claude-sonnet-5',
-      max_tokens: 512,
+      max_tokens: 1536,
       messages: [{ role: 'user', content: prompt }],
     });
     const textBlock = message.content.find((block) => block.type === 'text');
-    const parsed = JSON.parse(textBlock?.text ?? '{}') as Partial<ReviewApiResult>;
-    return { approved: Boolean(parsed.approved), reasoning: String(parsed.reasoning ?? '') };
+    return parseReviewResponse(textBlock?.text ?? '{}');
   };
 }
 

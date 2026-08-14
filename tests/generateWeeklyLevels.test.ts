@@ -12,6 +12,7 @@ import {
   runWeeklyGeneration,
   nextGeneratedId,
   formatSummary,
+  parseReviewResponse,
 } from '../scripts/generate-weekly-levels';
 import { TIER_DEFINITIONS } from '../scripts/generate-levels';
 import type { LevelData, LevelIndex } from '../src/data/LevelSchema';
@@ -117,6 +118,20 @@ describe('buildReviewPrompt', () => {
     expect(prompt).toContain('difficultyScore');
     expect(prompt).toContain('approved');
     expect(prompt).toContain('reasoning');
+  });
+});
+
+describe('parseReviewResponse', () => {
+  it('returns the parsed result for valid JSON', () => {
+    const result = parseReviewResponse('{"approved": true, "reasoning": "solid level"}');
+    expect(result).toEqual({ approved: true, reasoning: 'solid level' });
+  });
+
+  it('returns a rejected fallback for truncated/invalid JSON instead of throwing', () => {
+    const truncated = '{"approved": false, "reasoning": "this string never closes';
+    const result = parseReviewResponse(truncated);
+    expect(result.approved).toBe(false);
+    expect(result.reasoning).toContain(truncated.slice(0, 200));
   });
 });
 
