@@ -1,10 +1,11 @@
 name: Weekly Level Generation
 
 on:
-  # Placeholder schedule -- easily adjustable, e.g. to a lower-traffic time or
-  # a different day, once the team has a preference.
+  # Runs monthly rather than weekly: at current AI-review usage (~$0.03-0.04
+  # per run) cost isn't the driver, but a demo/portfolio project doesn't need
+  # fresh content weekly.
   schedule:
-    - cron: '0 0 * * 1' # Monday 00:00 UTC
+    - cron: '0 0 1 * *' # 1st of each month, 00:00 UTC
   workflow_dispatch: {}
 
 permissions:
